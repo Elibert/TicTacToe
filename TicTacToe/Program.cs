@@ -1,7 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using TicTacToe.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<TictactoeContext>(options=>options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TICTACTOE;Integrated Security = true"));
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 

@@ -1,0 +1,152 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using TicTacToe.Models;
+
+namespace TicTacToe.Data;
+
+public partial class TictactoeContext : DbContext
+{
+    public TictactoeContext()
+    {
+    }
+
+    public TictactoeContext(DbContextOptions<TictactoeContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<Club> Clubs { get; set; }
+
+    public virtual DbSet<Game> Games { get; set; }
+
+    public virtual DbSet<GameClub> GameClubs { get; set; }
+
+    public virtual DbSet<GameMove> GameMoves { get; set; }
+
+    public virtual DbSet<Player> Players { get; set; }
+
+    public virtual DbSet<PlayerClubHistory> PlayerClubHistories { get; set; }
+
+    public virtual DbSet<Round> Rounds { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Club>(entity =>
+        {
+            entity.ToTable("Club");
+
+            entity.Property(e => e.ClubId).HasColumnName("club_id");
+            entity.Property(e => e.ClubLogo)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("club_logo");
+            entity.Property(e => e.ClubName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("club_name");
+        });
+
+        modelBuilder.Entity<Game>(entity =>
+        {
+            entity.ToTable("Game");
+
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.GameCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("game_code");
+            entity.Property(e => e.IsBeingPlayed).HasColumnName("is_being_played");
+            entity.Property(e => e.IsFinished).HasColumnName("is_finished");
+            entity.Property(e => e.IsP1Winner).HasColumnName("is_p1_winner");
+            entity.Property(e => e.P1Name)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("p1_name");
+            entity.Property(e => e.P2Name)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("p2_name");
+        });
+
+        modelBuilder.Entity<GameClub>(entity =>
+        {
+            entity.ToTable("Game_Club");
+
+            entity.Property(e => e.GameClubId).HasColumnName("game_club_id");
+            entity.Property(e => e.ClubId).HasColumnName("club_id");
+            entity.Property(e => e.ColNo).HasColumnName("col_no");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.RowNo).HasColumnName("row_no");
+
+            entity.HasOne(d => d.Game).WithMany(p => p.GameClubs)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_Club_Game");
+        });
+
+        modelBuilder.Entity<GameMove>(entity =>
+        {
+            entity.HasKey(e => e.MoveId);
+
+            entity.ToTable("Game_Moves");
+
+            entity.Property(e => e.MoveId).HasColumnName("move_id");
+            entity.Property(e => e.CellValue).HasColumnName("cellValue");
+            entity.Property(e => e.ColNo).HasColumnName("colNo");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.RowNo).HasColumnName("rowNo");
+
+            entity.HasOne(d => d.Game).WithMany(p => p.GameMoves)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_Moves_Game");
+        });
+
+        modelBuilder.Entity<Player>(entity =>
+        {
+            entity.ToTable("Player");
+
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.PlayerName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("player_name");
+        });
+
+        modelBuilder.Entity<PlayerClubHistory>(entity =>
+        {
+            entity.ToTable("Player_Club_History");
+
+            entity.Property(e => e.PlayerClubHistoryId).HasColumnName("player_club_history_id");
+            entity.Property(e => e.ClubId).HasColumnName("club_id");
+            entity.Property(e => e.PlayerId).HasColumnName("player_id");
+
+            entity.HasOne(d => d.Club).WithMany(p => p.PlayerClubHistories)
+                .HasForeignKey(d => d.ClubId)
+                .HasConstraintName("FK_Player_Club_History_Club");
+
+            entity.HasOne(d => d.Player).WithMany(p => p.PlayerClubHistories)
+                .HasForeignKey(d => d.PlayerId)
+                .HasConstraintName("FK_Player_Club_History_Player_Club_History");
+        });
+
+        modelBuilder.Entity<Round>(entity =>
+        {
+            entity.Property(e => e.RoundId).HasColumnName("round_id");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.IsFinished).HasColumnName("is_finished");
+            entity.Property(e => e.IsP1Win).HasColumnName("is_p1_win");
+            entity.Property(e => e.RoundNo).HasColumnName("round_no");
+
+            entity.HasOne(d => d.Game).WithMany(p => p.Rounds)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Rounds_Game");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}
