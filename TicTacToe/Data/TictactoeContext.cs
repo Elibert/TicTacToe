@@ -20,15 +20,15 @@ public partial class TictactoeContext : DbContext
 
     public virtual DbSet<Game> Games { get; set; }
 
+    public virtual DbSet<GameClub> GameClubs { get; set; }
+
+    public virtual DbSet<GameMove> GameMoves { get; set; }
+
     public virtual DbSet<Player> Players { get; set; }
 
     public virtual DbSet<PlayerClubHistory> PlayerClubHistories { get; set; }
 
     public virtual DbSet<Round> Rounds { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TICTACTOE;Integrated Security = true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,6 +58,7 @@ public partial class TictactoeContext : DbContext
                 .HasColumnName("game_code");
             entity.Property(e => e.IsBeingPlayed).HasColumnName("is_being_played");
             entity.Property(e => e.IsFinished).HasColumnName("is_finished");
+            entity.Property(e => e.IsP1Winner).HasColumnName("is_p1_winner");
             entity.Property(e => e.P1Name)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -66,6 +67,40 @@ public partial class TictactoeContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("p2_name");
+        });
+
+        modelBuilder.Entity<GameClub>(entity =>
+        {
+            entity.ToTable("Game_Club");
+
+            entity.Property(e => e.GameClubId).HasColumnName("game_club_id");
+            entity.Property(e => e.ClubId).HasColumnName("club_id");
+            entity.Property(e => e.ColNo).HasColumnName("col_no");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.RowNo).HasColumnName("row_no");
+
+            entity.HasOne(d => d.Game).WithMany(p => p.GameClubs)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_Club_Game");
+        });
+
+        modelBuilder.Entity<GameMove>(entity =>
+        {
+            entity.HasKey(e => e.MoveId);
+
+            entity.ToTable("Game_Moves");
+
+            entity.Property(e => e.MoveId).HasColumnName("move_id");
+            entity.Property(e => e.CellValue).HasColumnName("cellValue");
+            entity.Property(e => e.ColNo).HasColumnName("colNo");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.RowNo).HasColumnName("rowNo");
+
+            entity.HasOne(d => d.Game).WithMany(p => p.GameMoves)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_Moves_Game");
         });
 
         modelBuilder.Entity<Player>(entity =>
