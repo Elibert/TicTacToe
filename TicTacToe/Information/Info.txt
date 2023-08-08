@@ -1,3 +1,1 @@
-﻿Scaffold-DbContext 
-"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TICTACTOE;Integrated Security = true" Microsoft.EntityFrameworkCore.SqlServer 
--ContextDir Data -OutputDir Models/Generated -ContextNamespace TicTacToe.Data -Namespace TicTacToe.Models -f
+﻿Scaffold-DbContext "Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TICTACTOE;Integrated Security = true" Microsoft.EntityFrameworkCore.SqlServer -ContextDir Data -OutputDir Models/Generated -ContextNamespace TicTacToe.Data -Namespace TicTacToe.Models -f

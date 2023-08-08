@@ -21,7 +21,5 @@ public partial class Game
 
     public virtual ICollection<GameClub> GameClubs { get; set; } = new List<GameClub>();
 
-    public virtual ICollection<GameMove> GameMoves { get; set; } = new List<GameMove>();
-
     public virtual ICollection<Round> Rounds { get; set; } = new List<Round>();
 }
