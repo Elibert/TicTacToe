@@ -7,7 +7,7 @@ public partial class GameMove
 {
     public int MoveId { get; set; }
 
-    public int GameId { get; set; }
+    public int RoundId { get; set; }
 
     public int RowNo { get; set; }
 
@@ -15,5 +15,5 @@ public partial class GameMove
 
     public int CellValue { get; set; }
 
-    public virtual Game Game { get; set; } = null!;
+    public virtual Round Round { get; set; } = null!;
 }

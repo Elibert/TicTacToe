@@ -7,6 +7,8 @@
         
         public int CoordinateY { get; set; }
 
+        public int PlayerId { get; set; }
+
         public TicTacToeTypes Movetype { get; set; }
     }
 }
