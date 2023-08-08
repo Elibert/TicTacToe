@@ -16,4 +16,6 @@ public partial class Round
     public bool? IsFinished { get; set; }
 
     public virtual Game Game { get; set; } = null!;
+
+    public virtual ICollection<GameMove> GameMoves { get; set; } = new List<GameMove>();
 }

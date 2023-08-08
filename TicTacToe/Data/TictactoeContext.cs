@@ -94,11 +94,11 @@ public partial class TictactoeContext : DbContext
             entity.Property(e => e.MoveId).HasColumnName("move_id");
             entity.Property(e => e.CellValue).HasColumnName("cellValue");
             entity.Property(e => e.ColNo).HasColumnName("colNo");
-            entity.Property(e => e.GameId).HasColumnName("game_id");
+            entity.Property(e => e.RoundId).HasColumnName("round_id");
             entity.Property(e => e.RowNo).HasColumnName("rowNo");
 
-            entity.HasOne(d => d.Game).WithMany(p => p.GameMoves)
-                .HasForeignKey(d => d.GameId)
+            entity.HasOne(d => d.Round).WithMany(p => p.GameMoves)
+                .HasForeignKey(d => d.RoundId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Game_Moves_Game");
         });

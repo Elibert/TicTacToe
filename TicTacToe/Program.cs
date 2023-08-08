@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TicTacToe.Data;
+using TicTacToe.Signal;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.MapHub<TicTacToeHub>("/TicTacToeHub");
 
 app.UseAuthorization();
 
