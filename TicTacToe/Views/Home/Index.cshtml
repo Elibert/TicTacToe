@@ -1,8 +1,13 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<script src="@Url.Content("~/js/Views/Index/Index.js")" type="text/javascript" defer="defer"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.12/signalr.min.js"></script>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div class="form-container">
+    <h2>Tic Tac Toe</h2>
+<input class="input-box" type="text" id="player1Name" placeholder="Enter your name here">
+    <div class="button-container">
+    <button class="button primary" id="create">Create Room</button>
+    <button class="button secondary" id="join">Join Room</button>
+    </div>
 </div>
