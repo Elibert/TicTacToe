@@ -21,7 +21,7 @@ namespace TicTacToe.Controllers
                 Club clubModel = new Club();
                 clubModel.ClubLogo = club.logo;
                 clubModel.ClubName = club.name;
-                clubModel.ClubId = Convert.ToInt32(club.team_id);
+                clubModel.ApiTeamId = club.team_id;
                 _context.Clubs.Add(clubModel);
             }
             _context.SaveChanges();
