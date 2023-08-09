@@ -11,5 +11,7 @@ public partial class Club
 
     public string? ClubLogo { get; set; }
 
+    public string? ApiTeamId { get; set; }
+
     public virtual ICollection<PlayerClubHistory> PlayerClubHistories { get; set; } = new List<PlayerClubHistory>();
 }

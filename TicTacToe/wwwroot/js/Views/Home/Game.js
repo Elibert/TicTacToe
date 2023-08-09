@@ -19,18 +19,23 @@ input.onkeyup = (e) => {
             data: {
                 playerName: userData
             },
-            success: function (data) {
-                emptyArray = data;
-                emptyArray = emptyArray.map((data) => {
-                    // passing return data inside li tag
-                    return data = '<li value='+data.playerId+'>' + data.playerName + '</li>';
-                });
-                searchInput.classList.add("active"); //show autocomplete box
-                showSuggestions(emptyArray);
-                let allList = resultBox.querySelectorAll("li");
-                for (let i = 0; i < allList.length; i++) {
-                    //adding onclick attribute in all li tag
-                    allList[i].setAttribute("onclick", "select(this)");
+            success: function (data) {              
+                if (data.length != 0) {
+                    emptyArray = data;
+                    emptyArray = emptyArray.map((data) => {
+                        // passing return data inside li tag
+                        return data = '<li value='+data.playerId+'>' + data.playerName + '</li>';
+                    });
+                    searchInput.classList.add("active"); //show autocomplete box
+                    showSuggestions(emptyArray);
+                    let allList = resultBox.querySelectorAll("li");
+                    for (let i = 0; i < allList.length; i++) {
+                        //adding onclick attribute in all li tag
+                        allList[i].setAttribute("onclick", "select(this)");
+                    }
+                }
+                else {
+                    searchInput.classList.remove("active"); //hide autocomplete box
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
@@ -50,7 +55,6 @@ function select(param) {
 }
 
 $(".tic").click(function () {
-    debugger
     if ($("#playerId").val() == "" || $("#playerId").val() == null) {
         alert("select a player!");
     }

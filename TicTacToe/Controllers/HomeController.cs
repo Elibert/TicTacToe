@@ -21,7 +21,7 @@ namespace TicTacToe.Controllers
         }
         public IActionResult Game()
         {
-            return View();
+            return PartialView();
         }
         public IActionResult Privacy()
         {
@@ -36,20 +36,40 @@ namespace TicTacToe.Controllers
 
         public ActionResult CreateGame(string playerName)
         {
-            Game game = Models.Game.createGame(playerName);
+            User newUser = new User();
+            newUser.UserName = playerName;
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+            Game game = Models.Game.createGame();
+            game.P1UserId = _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p=>p.UserId).Last().UserId;
             _context.Games.Add(game);
             _context.SaveChanges();
-            return View();
+            return PartialView("WaitingRoom");
         }
 
-        public ActionResult ConnectGame(string playerName, string gameCode)
+        public ActionResult JoinRoom(string playerName)
+        {
+            User newUser = new User();
+            newUser.UserName = playerName;
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+            ViewData.Model= _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p => p.UserId).Last().UserId;
+            return PartialView();
+        }
+
+        public ActionResult ConnGame(string gameCode)
+        {
+            Game game = _context.Games.Where(p => p.GameCode == gameCode).Include(g=>g.Rounds).Include(g=>g.GameClubs).First();
+            return PartialView("Game", game);
+        }
+        public ActionResult ConnectGame(int playerId, string gameCode)
         {
             if (_context.Games.Where(g => g.GameCode == gameCode).ToList().Count > 0)
             {
                 Game game = _context.Games.Where(g => g.GameCode == gameCode).First();
                 if (!game.IsBeingPlayed && !game.IsFinished)
                 {
-                    game.P2Name = playerName;
+                    game.P2UserId = playerId;
                     game.IsBeingPlayed = true;
                     GameClub gameClub;
                     List<Club> clubs = _context.Clubs.ToList();
@@ -89,7 +109,7 @@ namespace TicTacToe.Controllers
                     }
                     game.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = 1 });
                     _context.SaveChanges();
-                    return View("Game", game);
+                    return PartialView("Game", game);
                 }
                 else
                 {

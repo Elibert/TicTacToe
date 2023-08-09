@@ -30,6 +30,10 @@ public partial class TictactoeContext : DbContext
 
     public virtual DbSet<Round> Rounds { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserConnection> UserConnections { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Club>(entity =>
@@ -37,6 +41,10 @@ public partial class TictactoeContext : DbContext
             entity.ToTable("Club");
 
             entity.Property(e => e.ClubId).HasColumnName("club_id");
+            entity.Property(e => e.ApiTeamId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("api_team_id");
             entity.Property(e => e.ClubLogo)
                 .HasMaxLength(500)
                 .IsUnicode(false)
@@ -59,14 +67,17 @@ public partial class TictactoeContext : DbContext
             entity.Property(e => e.IsBeingPlayed).HasColumnName("is_being_played");
             entity.Property(e => e.IsFinished).HasColumnName("is_finished");
             entity.Property(e => e.IsP1Winner).HasColumnName("is_p1_winner");
-            entity.Property(e => e.P1Name)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("p1_name");
-            entity.Property(e => e.P2Name)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("p2_name");
+            entity.Property(e => e.P1UserId).HasColumnName("p1_user_id");
+            entity.Property(e => e.P2UserId).HasColumnName("p2_user_id");
+
+            entity.HasOne(d => d.P1User).WithMany(p => p.GameP1Users)
+                .HasForeignKey(d => d.P1UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_User");
+
+            entity.HasOne(d => d.P2User).WithMany(p => p.GameP2Users)
+                .HasForeignKey(d => d.P2UserId)
+                .HasConstraintName("FK_Game_Game");
         });
 
         modelBuilder.Entity<GameClub>(entity =>
@@ -108,6 +119,10 @@ public partial class TictactoeContext : DbContext
             entity.ToTable("Player");
 
             entity.Property(e => e.PlayerId).HasColumnName("player_id");
+            entity.Property(e => e.ApiPlayerId)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("api_player_id");
             entity.Property(e => e.PlayerName)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -143,6 +158,29 @@ public partial class TictactoeContext : DbContext
                 .HasForeignKey(d => d.GameId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Rounds_Game");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("User");
+
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("user_name");
+        });
+
+        modelBuilder.Entity<UserConnection>(entity =>
+        {
+            entity.ToTable("User_Connection");
+
+            entity.Property(e => e.UserConnectionId).HasColumnName("user_connection_id");
+            entity.Property(e => e.ConnectionId)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("connection_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
         });
 
         OnModelCreatingPartial(modelBuilder);
