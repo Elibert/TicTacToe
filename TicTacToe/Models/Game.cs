@@ -5,10 +5,9 @@ namespace TicTacToe.Models;
 
 public partial class Game
 {
-    public static Game createGame(string playername)
+    public static Game createGame()
     {
         Game game = new Game();
-        game.P1Name = playername;
         game.IsBeingPlayed = false;
         game.IsFinished = false;
         game.GameCode = Guid.NewGuid().ToString();
