@@ -9,5 +9,8 @@ namespace TicTacToe.DataSet
         public Task<GetPlayerIds> GetPlayerIdsByTeam(int leagueId);
 
         public Task<GetPlayerHistory> GetPlayerClubHistory(int playerId);
+
+        public Task<GetPlayer> GetPlayerDetails(int playerId);
+
     }
 }
