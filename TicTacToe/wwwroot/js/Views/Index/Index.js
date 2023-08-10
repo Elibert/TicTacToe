@@ -93,6 +93,8 @@ function joinRoom(playerId) {
                 connection.invoke("StartGame", gameCode)
                     .catch(err => console.error(err));
                 $("#content").html(data);
+                $(".tic").prop("disabled", true);
+                $("#playerName").prop("disabled", true);
             },
             error: function (xhr, ajaxOptions, thrownError) {
             }

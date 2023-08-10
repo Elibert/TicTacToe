@@ -1,12 +1,7 @@
-﻿// getting all required elements
-const searchInput = document.querySelector(".searchInput");
+﻿const searchInput = document.querySelector(".searchInput");
 const input = searchInput.querySelector("input");
 const resultBox = searchInput.querySelector(".resultBox");
-const icon = searchInput.querySelector(".icon");
-let linkTag = searchInput.querySelector("a");
-let webLink;
 
-// if user press any key and release
 input.onkeyup = (e) => {
     let userData = e.target.value; //user enetered data
     let emptyArray = [];
@@ -69,7 +64,7 @@ $(".tic").click(function () {
                 CoordinateX: 0,
                 CoordinateY: 0,
                 PlayerId: $("#playerId").val(),
-                Movetype: "Y"
+                Movetype: $("#MoveType").val()
             }, 
             success: function (data) {
 
@@ -112,3 +107,17 @@ document.getElementById("sendMessageBtn").addEventListener("click", () => {
     connection.invoke("SendMessageToUser", userId, message)
         .catch(err => console.error(err));
 })
+
+var tlNotif = new TimelineMax({ paused: true, delay: 1.5 });
+tlNotif.add(TweenMax.to($(".notification"), 0.15, { height: "75%", top: "5%" }))
+    .add(TweenMax.to($(".notification"), 0.20, { height: "15%", top: "80%", ease: Expo.easeOut }))
+    .add(TweenMax.to($(".notification"), 0.60, { width: "50%", ease: Expo.easeOut }))
+    .add(TweenMax.to($(".notification p"), 0.50, { opacity: "1" }))
+    .add(TweenMax.to($(".notification p"), 0.50, { opacity: "0" }), "+=4")
+    .add(TweenMax.to($(".notification"), 0.60, { width: "0px", ease: Expo.easeIn }))
+    .add(TweenMax.to($(".notification"), 0.20, { height: "75%", top: "0%", ease: Expo.easeIn }))
+    .add(TweenMax.to($(".notification"), 0.15, { height: "1px", top: "-20px" }))
+    .call(function () {
+        $(".notification p").text("");
+        $(".notification").removeClass("ok").removeClass("error");
+    });

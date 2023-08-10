@@ -18,8 +18,4 @@
     <Folder Include="Content\GIF\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\DataSetApi\DataSetApi.csproj" />
-  </ItemGroup>
-
 </Project>

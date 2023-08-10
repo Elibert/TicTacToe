@@ -60,6 +60,7 @@ namespace TicTacToe.Controllers
         public ActionResult ConnGame(string gameCode)
         {
             Game game = _context.Games.Where(p => p.GameCode == gameCode).Include(g=>g.Rounds).Include(g=>g.GameClubs).First();
+            game.MoveType = TicTacToeTypes.X;
             return PartialView("Game", game);
         }
         public ActionResult ConnectGame(int playerId, string gameCode)
@@ -108,6 +109,7 @@ namespace TicTacToe.Controllers
                         }
                     }
                     game.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = 1 });
+                    game.MoveType = TicTacToeTypes.O;
                     _context.SaveChanges();
                     return PartialView("Game", game);
                 }
@@ -142,7 +144,7 @@ namespace TicTacToe.Controllers
                         return View();
 
                     bool isFirstPlayerWinner = CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.X);
-                    bool isSecondPlayerWinner = CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.Y);
+                    bool isSecondPlayerWinner = CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.O);
 
                     if (isFirstPlayerWinner || isSecondPlayerWinner)
                         actualRound.IsFinished = true;  

@@ -9,9 +9,12 @@
 <div hidden>
     @Html.HiddenFor(model=>model.GameId)
     @Html.HiddenFor(model=>model.Rounds)
+    @Html.HiddenFor(model=>model.MoveType)
 </div>
-<button id="sendMessageBtn">Send Message</button>
 
+<div class="notification">
+  <p></p>
+</div>
 <div class="container">
     <div class="searchInput">
         <input type="text" placeholder="Player name" id="playerName">

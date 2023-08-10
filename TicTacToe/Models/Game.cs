@@ -13,4 +13,6 @@ public partial class Game
         game.GameCode = Guid.NewGuid().ToString();
         return game;
     }
+
+    public TicTacToeTypes MoveType { get; set; }
 }
