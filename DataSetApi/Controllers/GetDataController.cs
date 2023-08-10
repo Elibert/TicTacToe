@@ -6,14 +6,14 @@ using Newtonsoft.Json;
 
 namespace DataSetApi.Controllers
 {
-    public class GetDataController
+    public class GetDataController : IGetData
     {
-        private static IConfiguration _config;
+        private IConfiguration _config;
         public GetDataController(IConfiguration config)
         {
             _config = config;
         }
-        public static async Task<Teams> GetTeamsByLeague(int leagueId)
+        public  async Task<Teams> GetTeamsByLeague(int leagueId)
         {
             var client = new HttpClient();
             var request = new HttpRequestMessage
