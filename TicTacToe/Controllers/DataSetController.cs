@@ -34,13 +34,23 @@ namespace TicTacToe.Controllers
             foreach(var club in _context.Clubs.ToList())
             {
                 var allteamPlayers = _getData.GetPlayerIdsByTeam(Convert.ToInt32(club.ApiTeamId));
-                foreach (var player in allteamPlayers.Result.response)
+                foreach (var player in allteamPlayers.Result.response.First().player)
                 {
                     Player playerModel = new Player();
-                    playerModel.ApiPlayerId = player.player.id.ToString();
-                    playerModel.PlayerName = player.player.firstname.Split(" ")[0] + " " + player.player.lastname;
+                    playerModel.ApiPlayerId = player.id.ToString();
+                    playerModel.PlayerName = player.name;
                     _context.Players.Add(playerModel);
                 }
+            }
+            _context.SaveChanges();
+        }
+
+        public void FillPlayerDetailsDataSet()
+        {
+            foreach (var player in _context.Players.ToList())
+            {
+                var playerDetails = _getData.GetPlayerDetails(Convert.ToInt32(player.ApiPlayerId));
+                player.PlayerName = playerDetails.Result.response.First().player.firstname.Split(' ')[0] + " " + playerDetails.Result.response.First().player.lastname;
             }
             _context.SaveChanges();
         }
@@ -50,20 +60,23 @@ namespace TicTacToe.Controllers
             foreach (var player in _context.Players.ToList())
             {
                 var allhistoryPlayer = _getData.GetPlayerClubHistory(Convert.ToInt32(player.ApiPlayerId));
-                foreach (var history in allhistoryPlayer.Result.response.First().transfers)
+                if(allhistoryPlayer.Result.response.Count > 0)
                 {
-                    PlayerClubHistory playerModel = new PlayerClubHistory();
-                    playerModel.PlayerId = _context.Players.Where(x => x.ApiPlayerId == allhistoryPlayer.Result.response.First().player.id.ToString()).First().PlayerId;
-                    playerModel.ClubId = _context.Clubs.Where(x => x.ApiTeamId == history.teams.@out.id.ToString()).First().ClubId;
-                    _context.PlayerClubHistories.Add(playerModel);
-
-                    //get both the "in" and "out" club if it is the first transfer
-                    if (allhistoryPlayer.Result.response.First().transfers.First() == history)
+                    foreach (var history in allhistoryPlayer.Result.response.First().transfers)
                     {
-                        PlayerClubHistory playerH = new PlayerClubHistory();
-                        playerH.PlayerId = _context.Players.Where(x => x.ApiPlayerId == allhistoryPlayer.Result.response.First().player.id.ToString()).First().PlayerId;
-                        playerH.ClubId = _context.Clubs.Where(x => x.ApiTeamId == history.teams.@in.id.ToString()).First().ClubId;
-                        _context.PlayerClubHistories.Add(playerH);
+                        PlayerClubHistory playerModel = new PlayerClubHistory();
+                        playerModel.PlayerId = _context.Players.Where(x => x.ApiPlayerId == allhistoryPlayer.Result.response.First().player.id.ToString()).First().PlayerId;
+                        playerModel.ClubId = _context.Clubs.Where(x => x.ApiTeamId == history.teams.@out.id.ToString()).First().ClubId;
+                        _context.PlayerClubHistories.Add(playerModel);
+
+                        //get both the "in" and "out" club if it is the first transfer
+                        if (allhistoryPlayer.Result.response.First().transfers.First() == history)
+                        {
+                            PlayerClubHistory playerH = new PlayerClubHistory();
+                            playerH.PlayerId = _context.Players.Where(x => x.ApiPlayerId == allhistoryPlayer.Result.response.First().player.id.ToString()).First().PlayerId;
+                            playerH.ClubId = _context.Clubs.Where(x => x.ApiTeamId == history.teams.@in.id.ToString()).First().ClubId;
+                            _context.PlayerClubHistories.Add(playerH);
+                        }
                     }
                 }
             }
