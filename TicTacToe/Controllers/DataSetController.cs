@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TicTacToe.Data;
-using DataSetApi.Controllers;
-using DataSetApi.Models;
+using TicTacToe.DataSet;
 using TicTacToe.Models;
 
 namespace TicTacToe.Controllers
@@ -9,13 +8,16 @@ namespace TicTacToe.Controllers
     public class DataSetController : Controller
     {
         private readonly TictactoeContext _context;
-        public DataSetController(TictactoeContext context)
+        private readonly IGetData _getData;
+
+        public DataSetController(TictactoeContext context, IGetData getData)
         {
             _context = context;
+            _getData = getData;
         }
         public void CreateClubDataSet()
         {
-            var allLeagueClubs = GetDataController.GetTeamsByLeague(135);
+            var allLeagueClubs = _getData.GetTeamsByLeague(135);
             foreach(var club in allLeagueClubs.Result.api.teams)
             {
                 Club clubModel = new Club();
