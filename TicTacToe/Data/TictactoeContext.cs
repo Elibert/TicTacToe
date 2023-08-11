@@ -123,6 +123,9 @@ public partial class TictactoeContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("api_player_id");
+            entity.Property(e => e.Birthdate)
+                .HasColumnType("date")
+                .HasColumnName("birthdate");
             entity.Property(e => e.PlayerName)
                 .HasMaxLength(50)
                 .IsUnicode(false)

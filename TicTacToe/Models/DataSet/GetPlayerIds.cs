@@ -9,6 +9,7 @@
 
     public class Response
     {
-        public ApiPlayer player { get; set; }
+        public Team team { get; set; }
+        public List<ApiPlayer> players { get; set; }
     }
 }
