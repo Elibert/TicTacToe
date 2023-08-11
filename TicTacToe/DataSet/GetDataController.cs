@@ -37,7 +37,7 @@ namespace TicTacToe.DataSet
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri("https://" + _config.GetSection("ApiData:baseUrl").Value + "/v3/players?team=" + teamId + "&season="+ DateTime.Today.Year),
+                RequestUri = new Uri("https://" + _config.GetSection("ApiData:baseUrl").Value + "/v3/players/squads?team=" + teamId),
                 Headers =
             {
                 { "X-RapidAPI-Key", _config.GetSection("ApiData:key").Value },
@@ -48,6 +48,27 @@ namespace TicTacToe.DataSet
             {
                 var body = await response.Content.ReadAsStringAsync();
                 GetPlayerIds result = JsonConvert.DeserializeObject<GetPlayerIds>(body);
+                return result;
+            }
+        }
+
+        public async Task<GetPlayer> GetPlayerDetails(int playerId)
+        {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("https://" + _config.GetSection("ApiData:baseUrl").Value + "/v3/players=" + playerId + "&season=" + DateTime.Today.Year),
+                Headers =
+            {
+                { "X-RapidAPI-Key", _config.GetSection("ApiData:key").Value },
+                { "X-RapidAPI-Host", _config.GetSection("ApiData:baseUrl").Value },
+            },
+            };
+            using (var response = await client.SendAsync(request))
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                GetPlayer result = JsonConvert.DeserializeObject<GetPlayer>(body);
                 return result;
             }
         }

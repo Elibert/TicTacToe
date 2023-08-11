@@ -65,6 +65,16 @@ namespace TicTacToe.Controllers
             _context.SaveChanges();
         }
 
+        public void FillPlayerDetailsDataSet()
+        {
+            foreach (var player in _context.Players.ToList())
+            {
+                var playerDetails = _getData.GetPlayerDetails(Convert.ToInt32(player.ApiPlayerId));
+                player.PlayerName = playerDetails.Result.response.First().player.firstname.Split(' ')[0] + " " + playerDetails.Result.response.First().player.lastname;
+            }
+            _context.SaveChanges();
+        }
+
         public void CreatePlayerClubHistoryDataSet()
         {
             int i = 1;
