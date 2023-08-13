@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using TicTacToe.Data;
+using TicTacToe.Models;
 
 namespace TicTacToe.Signal
 {
@@ -31,18 +32,13 @@ namespace TicTacToe.Signal
 
         //public override async Task OnDisconnectedAsync(Exception exception)
         //{
-        //    string userIdentifier = Context.GetHttpContext().Request.Query["userId"];
-
-        //    if (!string.IsNullOrEmpty(userIdentifier) && _userConnections.ContainsKey(userIdentifier))
-        //    {
-        //        _userConnections[userIdentifier].Remove(Context.ConnectionId);
-        //        if (_userConnections[userIdentifier].Count == 0)
-        //        {
-        //            _userConnections.Remove(userIdentifier);
-        //        }
-        //    }
-
-        //    await base.OnDisconnectedAsync(exception);
+        //    //var connections = context.UserConnections.Where(c => c.ConnectionId == Context.ConnectionId);
+        //    //if (connections.Count()>0)
+        //    //{
+        //    //    context.UserConnections.RemoveRange(connections);
+        //    //    context.SaveChanges();
+        //    //}
+        //    //await base.OnDisconnectedAsync(exception);
         //}
 
         public void Subscribe(string user)
@@ -73,10 +69,24 @@ namespace TicTacToe.Signal
                 // Handle accordingly
             }
         }
-        public async Task StartGame(string gameCode)
+        public async Task StartGame(int gameId)
         {
-            int userId = context.Games.Where(g => g.GameCode == gameCode).First().P1UserId;
-           await Clients.Client(context.UserConnections.Where(u=>u.UserId==userId).OrderByDescending(o=>o.UserConnectionId).Last().ConnectionId).SendAsync("ChangeScreenEnterGame", gameCode);
+            int userId = context.Games.Where(g => g.GameId == gameId).First().P1UserId;
+           await Clients.Client(GetConnectionId(userId)).SendAsync("ChangeScreenEnterGame", gameId);
+        }
+
+        public async Task MakeMove(int userId, int coordinateX, int coordinateY, TicTacToeTypes? moveType, bool isRoundfinished)
+        {
+            await Clients.Client(GetConnectionId(userId)).SendAsync("changeTurns", coordinateX, coordinateY, moveType, isRoundfinished);
+        }
+        public async Task SelectedPlayer(int userId, string playerName)
+        {
+            await Clients.Client(GetConnectionId(userId)).SendAsync("selectedPlayer", playerName);
+        }
+
+        public string GetConnectionId(int userId)
+        {
+            return context.UserConnections.Where(u => u.UserId == userId).OrderByDescending(o => o.UserConnectionId).Last().ConnectionId;
         }
     }
 }

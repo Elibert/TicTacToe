@@ -15,5 +15,7 @@ public partial class GameClub
 
     public int ColNo { get; set; }
 
+    public virtual Club Club { get; set; } = null!;
+
     public virtual Game Game { get; set; } = null!;
 }

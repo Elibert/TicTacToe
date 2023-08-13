@@ -90,6 +90,11 @@ public partial class TictactoeContext : DbContext
             entity.Property(e => e.GameId).HasColumnName("game_id");
             entity.Property(e => e.RowNo).HasColumnName("row_no");
 
+            entity.HasOne(d => d.Club).WithMany(p => p.GameClubs)
+                .HasForeignKey(d => d.ClubId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_Club_Club");
+
             entity.HasOne(d => d.Game).WithMany(p => p.GameClubs)
                 .HasForeignKey(d => d.GameId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -123,6 +128,9 @@ public partial class TictactoeContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("api_player_id");
+            entity.Property(e => e.Birthdate)
+                .HasColumnType("date")
+                .HasColumnName("birthdate");
             entity.Property(e => e.PlayerName)
                 .HasMaxLength(50)
                 .IsUnicode(false)

@@ -1,12 +1,7 @@
-﻿// getting all required elements
-const searchInput = document.querySelector(".searchInput");
+﻿const searchInput = document.querySelector(".searchInput");
 const input = searchInput.querySelector("input");
 const resultBox = searchInput.querySelector(".resultBox");
-const icon = searchInput.querySelector(".icon");
-let linkTag = searchInput.querySelector("a");
-let webLink;
 
-// if user press any key and release
 input.onkeyup = (e) => {
     let userData = e.target.value; //user enetered data
     let emptyArray = [];
@@ -49,16 +44,33 @@ input.onkeyup = (e) => {
 }
 function select(param) {
     $("#playerId").val($(param).val());
-    $("#playerName").text("");
-    $("#message").text($(param).text()+" is selected.");
+    $("#playerName").val("")
+    $("#message").text($(param).text() + " is selected.");
+
     searchInput.classList.remove("active");
+
+    $.ajax({
+        type: "GET",
+        url: "/Home/SelectPlayer/",
+        contentType: 'application/json; charset=utf-8',
+        datatype: 'json',
+        data: {
+            userId: $("#OpponentUserId").val(),
+            playerName: $(param).text(),
+        },
+        success: function (data) {
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+        }
+    });
 }
 
 $(".tic").click(function () {
     if ($("#playerId").val() == "" || $("#playerId").val() == null) {
-        alert("select a player!");
+        alert("Select a player!");
     }
     else {
+        var slot = $(this).attr('id');
         $.ajax({
             type: "GET",
             url: "/Home/MakeMove/",
@@ -66,13 +78,28 @@ $(".tic").click(function () {
             datatype: 'json',
             data: {
                 GameId: $("#GameId").val(),
-                CoordinateX: 0,
-                CoordinateY: 0,
+                CoordinateX: slot.split('_')[0],
+                CoordinateY: slot.split('_')[1],
                 PlayerId: $("#playerId").val(),
-                Movetype: "Y"
+                Movetype: $("#MoveType").val()
             }, 
             success: function (data) {
-
+                if (data.finishedRound) {
+                    alert("Loja mbaroi");
+                }
+                else {
+                    $(".tic").css("pointer-events", "none");
+                    $("#playerName").prop("disabled", true);
+                    $("#playerName").val("")
+                    $("#playerId").val("");
+                    $("#message").text("");
+                    if (data.correctMove) {
+                        $("#" + slot).text($("#MoveType").val());
+                    }
+                    else {
+                        alert("wrong move");
+                    }
+                }
             },
             error: function (xhr, ajaxOptions, thrownError) {
             }
@@ -90,25 +117,3 @@ function showSuggestions(list) {
     }
     resultBox.innerHTML = listData;
 }
-
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/TicTacToeHub")
-    .build();
-
-connection.on("ReceiveMessage", (message) => {
-    // Handle received message
-    console.log(message);
-});
-
-connection.start()
-    .then(() => {
-        // Connection established
-    })
-    .catch(err => console.error(err));
-
-document.getElementById("sendMessageBtn").addEventListener("click", () => {
-    const userId = "user123"; // Replace with the actual user ID
-    const message = "Hello, unauthenticated user!";
-    connection.invoke("SendMessageToUser", userId, message)
-        .catch(err => console.error(err));
-})

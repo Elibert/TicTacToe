@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 using TicTacToe.Data;
+using TicTacToe.Helpers;
 using TicTacToe.Models;
+using TicTacToe.Signal;
 
 namespace TicTacToe.Controllers
 {
@@ -10,9 +14,14 @@ namespace TicTacToe.Controllers
     {
         private readonly TictactoeContext _context;
         private static Random rnd= new Random();
-        public HomeController(TictactoeContext context)
+        private SignalRSender signal;
+        private IConfiguration _config;
+
+        public HomeController(TictactoeContext context,IConfiguration config)
         {
             _context = context;
+            _config = config;
+            signal = new(_config);
         }
 
         public IActionResult Index()
@@ -41,12 +50,13 @@ namespace TicTacToe.Controllers
             _context.Users.Add(newUser);
             _context.SaveChanges();
             Game game = Models.Game.createGame();
+            game.GameCode = FunctionHelper.GenerateCode(7, _context);
             game.P1UserId = _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p=>p.UserId).Last().UserId;
             _context.Games.Add(game);
             _context.SaveChanges();
-            return PartialView("WaitingRoom");
+            return PartialView("WaitingRoom",game.GameCode);
         }
-
+        
         public ActionResult JoinRoom(string playerName)
         {
             User newUser = new User();
@@ -57,9 +67,15 @@ namespace TicTacToe.Controllers
             return PartialView();
         }
 
-        public ActionResult ConnGame(string gameCode)
+        public ActionResult ConnGame(int gameId)
         {
-            Game game = _context.Games.Where(p => p.GameCode == gameCode).Include(g=>g.Rounds).Include(g=>g.GameClubs).First();
+            Game game = _context.Games.Where(p => p.GameId == gameId).Include(g=>g.Rounds)
+                                                                     .Include(g=>g.P1User)
+                                                                     .Include(g=>g.P2User)
+                                                                     .Include(g=>g.GameClubs)
+                                                                     .ThenInclude(gc => gc.Club).First();
+            game.OpponentUserId = (int)game.P2UserId;
+            game.MoveType = TicTacToeTypes.X;
             return PartialView("Game", game);
         }
         public ActionResult ConnectGame(int playerId, string gameCode)
@@ -70,9 +86,10 @@ namespace TicTacToe.Controllers
                 if (!game.IsBeingPlayed && !game.IsFinished)
                 {
                     game.P2UserId = playerId;
+                    game.OpponentUserId = game.P1UserId;
                     game.IsBeingPlayed = true;
-                    GameClub gameClub;
-                    List<Club> clubs = _context.Clubs.ToList();
+                    GameClub gameClub=new();
+                    List<Club> allClubs = _context.Clubs.ToList();
                     List<Club> selectedClubs = new List<Club>();
                     List<Club> possibleClubsForVerticalAlign = new List<Club>();
                     int r;
@@ -80,19 +97,15 @@ namespace TicTacToe.Controllers
                     {
                         if (i == 0)
                         {
-                            for (int j = 1; j <= 3; j++)
+                            do
                             {
-                                r = rnd.Next(clubs.Count() - selectedClubs.Count() - 1);
-                                Club club = clubs.Except(selectedClubs).ToList()[r];
-                                selectedClubs.Add(club);
-                                gameClub = new GameClub();
-                                gameClub.ClubId = club.ClubId;
-                                gameClub.ColNo = j;
-                                gameClub.RowNo = i;
-                                game.GameClubs.Add(gameClub);
+                                selectedClubs.Clear();
+                                game.GameClubs.Clear();
+                                SelectThreeTeams(game, gameClub, selectedClubs, allClubs);
+                                string club_ids = String.Join(",", game.GameClubs.Where(p => p.RowNo == i).Select(c => c.ClubId).ToList());
+                                possibleClubsForVerticalAlign = _context.Clubs.FromSqlInterpolated($"Generate_Possible_Clubs {club_ids}").ToList();
                             }
-                            string club_ids = String.Join(",", game.GameClubs.Where(p => p.RowNo == 0).Select(c => c.ClubId).ToList());
-                            possibleClubsForVerticalAlign = _context.Clubs.FromSqlInterpolated($"Generate_Possible_Clubs {club_ids}").ToList();
+                            while (possibleClubsForVerticalAlign.Count() < 3);
                         }
                         else
                         {
@@ -108,7 +121,14 @@ namespace TicTacToe.Controllers
                         }
                     }
                     game.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = 1 });
+                    game.MoveType = TicTacToeTypes.O;
                     _context.SaveChanges();
+                    game = _context.Games.Where(g => g.GameCode == gameCode).Include(g => g.GameClubs)
+                                                                            .ThenInclude(gc => gc.Club)
+                                                                            .Include(g => g.P1User)
+                                                                            .Include(g => g.P2User)                                                                                     
+                                                                            .Include(g => g.Rounds).First();
+                    signal.EnterGame(_context.Games.Where(g => g.GameCode == gameCode).First().GameId);
                     return PartialView("Game", game);
                 }
                 else
@@ -122,8 +142,23 @@ namespace TicTacToe.Controllers
             }
         }
 
+        public void SelectThreeTeams(Game game, GameClub gameClub, List<Club> selectedClubs, List<Club> clubs)
+        {
+            int r;
+            for (int j = 1; j <= 3; j++)
+            {
+                r = rnd.Next(clubs.Count() - selectedClubs.Count() - 1);
+                Club club = clubs.Except(selectedClubs).ToList()[r];
+                selectedClubs.Add(club);
+                gameClub = new GameClub();
+                gameClub.ClubId = club.ClubId;
+                gameClub.ColNo = j;
+                gameClub.RowNo = 0;
+                game.GameClubs.Add(gameClub);
+            }
+        }
         [HttpGet]
-        public ActionResult MakeMove(int GameId, int CoordinateX, int CoordinateY,int PlayerId,TicTacToeTypes Movetype)
+        public JsonResult MakeMove(int GameId, int CoordinateX, int CoordinateY,int PlayerId,TicTacToeTypes Movetype)
         {
             if(_context.Games.Where(g=>g.GameId==GameId && g.IsBeingPlayed).Count()>0)
             {
@@ -139,10 +174,13 @@ namespace TicTacToe.Controllers
                     if (hasPlayerPlayedForFirstClub && hasPlayerPlayedForSecondClub)
                         actualRound.GameMoves.Add(new GameMove { ColNo = CoordinateY, RowNo = CoordinateX, CellValue = (int)Movetype });
                     else
-                        return View();
+                    {
+                        signal.MakeMove(Movetype == TicTacToeTypes.X ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false);
+                        return Json(new { correctMove = false, finishedRound = false });
+                    }
 
-                    bool isFirstPlayerWinner = CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.X);
-                    bool isSecondPlayerWinner = CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.Y);
+                    bool isFirstPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.X);
+                    bool isSecondPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.O);
 
                     if (isFirstPlayerWinner || isSecondPlayerWinner)
                         actualRound.IsFinished = true;  
@@ -163,50 +201,18 @@ namespace TicTacToe.Controllers
                         thisGame.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = roundNo });
                     }
                     _context.SaveChanges();
-                    return View();
+                    signal.MakeMove(Movetype == TicTacToeTypes.X ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, Movetype, false);
+                    return Json(new { correctMove = true, finishedRound = actualRound.IsFinished });
                 }
                 else
                 {
-                    return View();
+                    return Json(new { correctMove = false, finishedRound = true });
                 }
             }
             else
             {
-                return View();
+                return Json(new { correctMove = false, finishedRound = true });
             }
-        }
-
-        public bool CheckIfThereIsAnyWinner(List<GameMove> gameMoves,TicTacToeTypes player)
-        {
-            int[] boardArray = new int[9];
-            int counterIndex = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    List<GameMove> moves = gameMoves.Where(gm => gm.RowNo == i && gm.ColNo == j).ToList();
-                    boardArray[counterIndex] = moves.Count()>0 ? moves.First().CellValue : 2;
-                    counterIndex++;
-                }
-            }
-
-            int[,] winCombinations =  new int[8, 3] { { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 }, { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 }, { 0, 4, 8 }, { 2, 4, 6 } };
-            for (int i = 0; i < 8; i++)
-            {
-                int counter = 0;
-                for (int j = 0; j < 3; j++)
-                {
-                    if (boardArray[winCombinations[i,j]] == (int)player)
-                    {
-                        counter++;
-                        if (counter == 3)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
         }
 
         [HttpGet]
@@ -216,6 +222,11 @@ namespace TicTacToe.Controllers
                           where m.PlayerName.Contains(playerName)
                           select m;
             return players.ToList();
+        }
+
+        public void SelectPlayer(int userId,string playerName)
+        {
+            signal.SelectedPlayer(userId, playerName);
         }
     }  
 }

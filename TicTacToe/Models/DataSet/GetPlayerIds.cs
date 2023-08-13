@@ -10,6 +10,6 @@
     public class Response
     {
         public Team team { get; set; }
-        public List<ApiPlayer> player { get; set; }
+        public List<ApiPlayer> players { get; set; }
     }
 }
