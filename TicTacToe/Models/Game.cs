@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TicTacToe.Models;
 
@@ -10,9 +11,12 @@ public partial class Game
         Game game = new Game();
         game.IsBeingPlayed = false;
         game.IsFinished = false;
-        game.GameCode = Guid.NewGuid().ToString();
         return game;
     }
 
+    [NotMapped]
     public TicTacToeTypes MoveType { get; set; }
+
+    [NotMapped]
+    public int OpponentUserId { get; set; }
 }

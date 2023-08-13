@@ -44,16 +44,33 @@ input.onkeyup = (e) => {
 }
 function select(param) {
     $("#playerId").val($(param).val());
-    $("#playerName").text("");
-    $("#message").text($(param).text()+" is selected.");
+    $("#playerName").val("")
+    $("#message").text($(param).text() + " is selected.");
+
     searchInput.classList.remove("active");
+
+    $.ajax({
+        type: "GET",
+        url: "/Home/SelectPlayer/",
+        contentType: 'application/json; charset=utf-8',
+        datatype: 'json',
+        data: {
+            userId: $("#OpponentUserId").val(),
+            playerName: $(param).text(),
+        },
+        success: function (data) {
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+        }
+    });
 }
 
 $(".tic").click(function () {
     if ($("#playerId").val() == "" || $("#playerId").val() == null) {
-        alert("select a player!");
+        alert("Select a player!");
     }
     else {
+        var slot = $(this).attr('id');
         $.ajax({
             type: "GET",
             url: "/Home/MakeMove/",
@@ -61,13 +78,28 @@ $(".tic").click(function () {
             datatype: 'json',
             data: {
                 GameId: $("#GameId").val(),
-                CoordinateX: 0,
-                CoordinateY: 0,
+                CoordinateX: slot.split('_')[0],
+                CoordinateY: slot.split('_')[1],
                 PlayerId: $("#playerId").val(),
                 Movetype: $("#MoveType").val()
             }, 
             success: function (data) {
-
+                if (data.finishedRound) {
+                    alert("Loja mbaroi");
+                }
+                else {
+                    $(".tic").css("pointer-events", "none");
+                    $("#playerName").prop("disabled", true);
+                    $("#playerName").val("")
+                    $("#playerId").val("");
+                    $("#message").text("");
+                    if (data.correctMove) {
+                        $("#" + slot).text($("#MoveType").val());
+                    }
+                    else {
+                        alert("wrong move");
+                    }
+                }
             },
             error: function (xhr, ajaxOptions, thrownError) {
             }
@@ -85,39 +117,3 @@ function showSuggestions(list) {
     }
     resultBox.innerHTML = listData;
 }
-
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/TicTacToeHub")
-    .build();
-
-connection.on("ReceiveMessage", (message) => {
-    // Handle received message
-    console.log(message);
-});
-
-connection.start()
-    .then(() => {
-        // Connection established
-    })
-    .catch(err => console.error(err));
-
-document.getElementById("sendMessageBtn").addEventListener("click", () => {
-    const userId = "user123"; // Replace with the actual user ID
-    const message = "Hello, unauthenticated user!";
-    connection.invoke("SendMessageToUser", userId, message)
-        .catch(err => console.error(err));
-})
-
-var tlNotif = new TimelineMax({ paused: true, delay: 1.5 });
-tlNotif.add(TweenMax.to($(".notification"), 0.15, { height: "75%", top: "5%" }))
-    .add(TweenMax.to($(".notification"), 0.20, { height: "15%", top: "80%", ease: Expo.easeOut }))
-    .add(TweenMax.to($(".notification"), 0.60, { width: "50%", ease: Expo.easeOut }))
-    .add(TweenMax.to($(".notification p"), 0.50, { opacity: "1" }))
-    .add(TweenMax.to($(".notification p"), 0.50, { opacity: "0" }), "+=4")
-    .add(TweenMax.to($(".notification"), 0.60, { width: "0px", ease: Expo.easeIn }))
-    .add(TweenMax.to($(".notification"), 0.20, { height: "75%", top: "0%", ease: Expo.easeIn }))
-    .add(TweenMax.to($(".notification"), 0.15, { height: "1px", top: "-20px" }))
-    .call(function () {
-        $(".notification p").text("");
-        $(".notification").removeClass("ok").removeClass("error");
-    });

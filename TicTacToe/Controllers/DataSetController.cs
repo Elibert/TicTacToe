@@ -65,47 +65,41 @@ namespace TicTacToe.Controllers
             _context.SaveChanges();
         }
 
-        public void FillPlayerDetailsDataSet()
-        {
-            foreach (var player in _context.Players.ToList())
-            {
-                var playerDetails = _getData.GetPlayerDetails(Convert.ToInt32(player.ApiPlayerId));
-                player.PlayerName = playerDetails.Result.response.First().player.firstname.Split(' ')[0] + " " + playerDetails.Result.response.First().player.lastname;
-            }
-            _context.SaveChanges();
-        }
-
         public void CreatePlayerClubHistoryDataSet()
         {
             int i = 1;
-            foreach (var player in _context.Players.ToList())
+            foreach (var player in _context.Players.ToList().Where(p=>p.PlayerId>187))
             {
-                if (i <= 29)
+                if (i <= 10)
                 {
                     var allhistoryPlayer = _getData.GetPlayerClubHistory(Convert.ToInt32(player.ApiPlayerId));
                     i++;
-                    if (allhistoryPlayer.Result.response.Count > 0)
+                    if (allhistoryPlayer.Result.response.Count > 0 && allhistoryPlayer.Result != null && allhistoryPlayer.Result.response!=null)
                     {
+                        bool firstTransfer = true;
                         foreach (var history in allhistoryPlayer.Result.response.First().transfers)
                         {
-                            PlayerClubHistory playerModel = new PlayerClubHistory();
-                            playerModel.PlayerId = _context.Players.Where(x => x.ApiPlayerId == allhistoryPlayer.Result.response.First().player.id.ToString()).First().PlayerId;
-                            if(_context.Clubs.Where(x => x.ApiTeamId == history.teams.@out.id.ToString()).Count()==0)
+                            if (_context.Clubs.Where(x => x.ApiTeamId == history.teams.@out.id.ToString()).Count() > 0)
                             {
-                                continue;
+                                PlayerClubHistory playerModel = new PlayerClubHistory();
+                                playerModel.PlayerId = player.PlayerId;
+                                playerModel.ClubId = _context.Clubs.Where(x => x.ApiTeamId == history.teams.@out.id.ToString()).First().ClubId;
+                                if(!_context.PlayerClubHistories.Any(p=>p.PlayerId==playerModel.PlayerId && p.ClubId==playerModel.ClubId))
+                                    _context.PlayerClubHistories.Add(playerModel);
                             }
-                            playerModel.ClubId = _context.Clubs.Where(x => x.ApiTeamId == history.teams.@out.id.ToString()).First().ClubId;
-                            _context.PlayerClubHistories.Add(playerModel);
 
                             //get both the "in" and "out" club if it is the first transfer
-                            if (allhistoryPlayer.Result.response.First().transfers.First() == history)
+                            if (firstTransfer && _context.Clubs.Where(x => x.ApiTeamId == history.teams.@in.id.ToString()).Count() > 0)
                             {
                                 PlayerClubHistory playerH = new PlayerClubHistory();
-                                playerH.PlayerId = _context.Players.Where(x => x.ApiPlayerId == allhistoryPlayer.Result.response.First().player.id.ToString()).First().PlayerId;
+                                playerH.PlayerId = player.PlayerId;
                                 playerH.ClubId = _context.Clubs.Where(x => x.ApiTeamId == history.teams.@in.id.ToString()).First().ClubId;
-                                _context.PlayerClubHistories.Add(playerH);
+                                if (!_context.PlayerClubHistories.Any(p => p.PlayerId == playerH.PlayerId && p.ClubId == playerH.ClubId))
+                                    _context.PlayerClubHistories.Add(playerH);
+                                firstTransfer = false;
                             }
                         }
+                        _context.SaveChanges();
                     }
                 }
                 else
@@ -113,7 +107,6 @@ namespace TicTacToe.Controllers
                     break;
                 }
             }
-            _context.SaveChanges();
         }
     }
 }

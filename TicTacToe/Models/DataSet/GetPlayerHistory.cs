@@ -29,7 +29,7 @@ namespace TicTacToe.Models.DataSet
 
     public class History
     {
-        public int id { get; set; }
+        public int? id { get; set; }
         public string name { get; set; }
         public string logo { get; set; }
     }

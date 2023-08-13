@@ -110,7 +110,7 @@ body {
   clear: both;
 }
 #box{
-  width: 350px;
+  width: 450px;
   overflow: auto;
   margin: 40px auto;
   background: #666;
@@ -133,9 +133,9 @@ body {
   text-align: center;
   border-radius: 5px;
 }
-#gameBoard li:hover, #reset:hover{
-  cursor: pointer;
-  background: #000;
+#gameBoard li:hover, #reset:hover {
+    cursor: pointer;
+    background: #000;
 }
 #reset{
   border: 0;
@@ -190,10 +190,76 @@ footer{
     color: #fff;
 }
 
-    .button.primary {
-        background-color: #007bff;
+.button.primary {
+    background-color: #007bff;
+}
+
+.button.secondary {
+   background-color: #6c757d;
+}
+
+/*Game*/
+.clubLogo{
+    width:70px;
+}
+
+.visible {
+    animation: movein 0.5s ease forwards, moveout 0.5s 3s ease forwards;
+}
+
+#notif {
+    width: 200px;
+    height: 100px;
+    background: #70c48f;
+    color: white;
+    border-radius: 3px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 100px;
+    left: -200px;
+}
+
+@keyframes movein {
+    from {
+        left: -200px;
     }
 
-    .button.secondary {
-        background-color: #6c757d;
+    to {
+        left: 10px;
     }
+}
+
+@keyframes moveout {
+    from {
+        left: 10px;
+    }
+
+    to {
+        left: -200px;
+    }
+}
+
+
+/*Layout*/
+#loading-container {
+    display:none;
+    position: absolute;
+    left: 42%;
+    top: 1%;
+    z-index: 1000;
+}
+
+#loading-gif {
+    display: block;
+    margin: 11px 15px 15px 16px;
+    width: 198px;
+    height: 190px;
+}
+
+/*WaitingRoom*/
+#waiting_bar{
+    width:400px;
+}
