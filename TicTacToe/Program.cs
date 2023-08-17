@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<TictactoeContext>(options=>options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TICTACTOE;Integrated Security = true"));
-
+builder.Services.AddScoped<IGetData, GetDataController>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IGetData, GetDataController>();
 var app = builder.Build();

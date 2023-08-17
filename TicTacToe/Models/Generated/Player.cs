@@ -9,6 +9,8 @@ public partial class Player
 
     public string? PlayerName { get; set; }
 
+    public DateTime? Birthdate { get; set; }
+
     public string? ApiPlayerId { get; set; }
 
     public virtual ICollection<PlayerClubHistory> PlayerClubHistories { get; set; } = new List<PlayerClubHistory>();

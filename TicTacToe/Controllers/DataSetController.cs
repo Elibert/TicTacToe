@@ -40,6 +40,7 @@ namespace TicTacToe.Controllers
 
         public void CreatePlayerIdDataSet()
         {
+            int i=1;
             foreach(var club in _context.Clubs.ToList())
             {
                 var allteamPlayers = _getData.GetPlayerIdsByTeam(Convert.ToInt32(club.ApiTeamId));
