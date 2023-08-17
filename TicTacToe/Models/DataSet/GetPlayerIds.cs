@@ -2,14 +2,9 @@
 {
     public class GetPlayerIds
     {
-        public List<object> errors { get; set; }
-        public int results { get; set; }
-        public List<Response> response { get; set; }
-    }
-
-    public class Response
-    {
-        public Team team { get; set; }
-        public List<ApiPlayer> player { get; set; }
+        public string id { get; set; }
+        public string clubName { get; set; }
+        public string seasonYear { get; set; }
+        public List<ApiPlayer> players { get; set; }
     }
 }
