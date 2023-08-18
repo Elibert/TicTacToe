@@ -40,7 +40,6 @@ namespace TicTacToe.Controllers
 
         public void CreatePlayerIdDataSet()
         {
-            int i=1;
             foreach(var club in _context.Clubs.ToList())
             {
                 var allteamPlayers = _getData.GetPlayerIdsByTeam(Convert.ToInt32(club.ApiTeamId));
@@ -48,6 +47,7 @@ namespace TicTacToe.Controllers
                 {
                     Player playerModel = new Player();
                     playerModel.ApiPlayerId = player.id.ToString();
+                    playerModel.Birthdate = Convert.ToDateTime(String.Format("{0:MM/dd/yyyy}", player.dateOfBirth));
                     playerModel.PlayerName = player.name;
                     _context.Players.Add(playerModel);
                 }
@@ -72,7 +72,7 @@ namespace TicTacToe.Controllers
                 foreach (var player in _context.Players.ToList())
                 {
                     var allhistoryPlayer = _getData.GetPlayerClubHistory(Convert.ToInt32(player.ApiPlayerId));
-                    if (allhistoryPlayer.Result.history.Count > 0)
+                    if (allhistoryPlayer.Result.history !=null && allhistoryPlayer.Result.history.Count > 0)
                     {
                         bool firstTransfer = true;
                         foreach (var history in allhistoryPlayer.Result.history)
