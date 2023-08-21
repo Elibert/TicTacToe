@@ -104,8 +104,9 @@ namespace TicTacToe.Controllers
             catch (Exception ex)
             {
                 _context.SaveChanges();
-                        
 
+            }
+        }
         public void CreatePlayerId()
         {
             List<int> retiredPlayers = new() { 65230,25557,26399,112465,5819,7912,30638,7717,5354,5962,7840,5759,6031,7600,58205,45403,43907,203412,5817,76061,50219,2540,5841,5922,5866,
