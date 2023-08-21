@@ -10,7 +10,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<TictactoeContext>(options=>options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TICTACTOE;Integrated Security = true"));
 builder.Services.AddScoped<IGetData, GetDataController>();
 builder.Services.AddSignalR();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

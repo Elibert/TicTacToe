@@ -5,33 +5,23 @@ namespace TicTacToe.Models.DataSet
 {
     public class GetPlayerHistory
     {
-        public int results { get; set; }
-        public List<PlayerHistory> response { get; set; }
+        public string id { get; set; }
+        public string name { get; set; }
+        public List<History> history { get; set; }
+        public List<string> youthClubs { get; set; }
+        public DateTime lastUpdate { get; set; }
     }
-    public class PlayerHistory
-    {
-        public ApiPlayer player { get; set; }
-        public DateTime update { get; set; }
-        public List<Transfer> transfers { get; set; }
-    }
-    public class Transfer
-    {
-        public string date { get; set; }
-        public string type { get; set; }
-        public Teams teams { get; set; }
-    }
-
-    public class Teams
-    {
-        public History @in { get; set; }
-        public History @out { get; set; }
-    }
-
     public class History
     {
-        public int? id { get; set; }
-        public string name { get; set; }
-        public string logo { get; set; }
+        public string transferID { get; set; }
+        public string transferSeason { get; set; }
+        public string transferDate { get; set; }
+        public string oldClubID { get; set; }
+        public string oldClubName { get; set; }
+        public string newClubID { get; set; }
+        public string newClubName { get; set; }
+        public string marketValue { get; set; }
+        public string fee { get; set; }
     }
 
 }

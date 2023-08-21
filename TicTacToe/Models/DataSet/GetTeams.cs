@@ -2,11 +2,19 @@
 {
     public class GetTeams
     {
-        public Api api { get; set; }
+        public string id { get; set; }
+        public string name { get; set; }
+        public string seasonID { get; set; }
+        public List<Club> clubs { get; set; }
+
     }
-    public class Api
+
+    public class Club
     {
-        public int results { get; set; }
-        public List<Team> teams { get; set; }
+        public string id { get; set; }
+        public string name { get; set; }
     }
+
+
+
 }

@@ -25,5 +25,4 @@
         public string place { get; set; }
         public string country { get; set; }
     }
-
 }

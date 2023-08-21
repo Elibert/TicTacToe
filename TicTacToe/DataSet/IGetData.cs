@@ -4,7 +4,9 @@ namespace TicTacToe.DataSet
 {
     public interface IGetData
     {
-        public Task<GetTeams> GetTeamsByLeague(int leagueId);
+        public Task<GetTeams> GetTeamsByLeague(string leagueId);
+
+        public Task<ClubProfile> GetTeamsProfile(string clubId);
 
         public Task<GetPlayerIds> GetPlayerIdsByTeam(int leagueId);
 
