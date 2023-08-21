@@ -38,10 +38,14 @@ body {
     max-width: 450px;
     margin: 40px auto;
 }
+.autocomplete_container{
+    width:100%;
+    margin:40px auto;
+}
 
-.container .searchInput {
+.autocomplete_container .searchInput {
     background: #fff;
-    width: 100%;
+    width: 106%;
     border-radius: 5px;
     position: relative;
     box-shadow: 0px 1px 5px 3px rgba(0,0,0,0.12);
@@ -198,12 +202,15 @@ footer{
    background-color: #6c757d;
 }
 
-/*Game*/
+/*Game CSS*/
 .clubLogo {
     width: 70px;
     font-size: 15px;
 }
-
+.small_loading {
+    width: 34px;
+    display:none;
+}
 .visible {
     animation: movein 0.5s ease forwards, moveout 0.5s 3s ease forwards;
 }
@@ -263,6 +270,13 @@ footer{
 /*WaitingRoom*/
 #waiting_bar{
     width:400px;
+}
+#waiting_toJoin_bar {
+    display: none;
+}
+
+#join_gif {
+    height: 122px;
 }
 /*GameScore*/
 @import url("https://fonts.googleapis.com/css?family=Ubuntu");

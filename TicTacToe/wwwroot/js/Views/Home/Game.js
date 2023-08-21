@@ -124,11 +124,19 @@ $("#changeClubs").click(function () {
         url: "/Home/changeRoundClubs/",
         contentType: 'application/json; charset=utf-8',
         datatype: 'json',
+        beforeSend: function () {
+            $('.small_loading').show();
+            $('.clubLogo').hide();
+        },
         data: {
             gameId: $("#GameId").val(),
         },
         success: function (data) {
 
+        },
+        complete: function(){
+            $('.small_loading').hide();
+            $('.clubLogo').show();
         },
         error: function (xhr, ajaxOptions, thrownError) {
         }

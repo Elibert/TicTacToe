@@ -22,25 +22,43 @@
     <div id="message"></div>
     <ul id="gameBoard">
         <li class="tic" id="0" style="background: none;"></li>
-        <li class="tic" id="1" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[0].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[0].Club.ClubName" /></li>
-        <li class="tic" id="2" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[1].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[1].Club.ClubName" /></li>
-        <li class="tic" id="3" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[2].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[2].Club.ClubName" /></li>
-        <li class="tic" id="4" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[3].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[3].Club.ClubName" /></li>
+        <li class="tic" id="1" style="background: none;">
+            <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[0].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[0].Club.ClubName" />
+            <img class="small_loading" src="~/Content/GIF/small_loading.gif">
+        </li>
+        <li class="tic" id="2" style="background: none;">
+            <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[1].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[1].Club.ClubName" />
+            <img class="small_loading" src="~/Content/GIF/small_loading.gif">
+        </li>
+        <li class="tic" id="3" style="background: none;">
+            <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[2].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[2].Club.ClubName" />
+            <img class="small_loading" src="~/Content/GIF/small_loading.gif">
+        </li>
+        <li class="tic" id="4" style="background: none;">
+            <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[3].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[3].Club.ClubName" />
+            <img class="small_loading" src="~/Content/GIF/small_loading.gif">
+        </li>
         <li class="tic" id="0_0"></li>
         <li class="tic" id="0_1"></li>
         <li class="tic" id="0_2"></li>
-        <li class="tic" id="8" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[4].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[4].Club.ClubName" /></li>
+        <li class="tic" id="5" style="background: none;">
+            <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[4].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[4].Club.ClubName" />
+            <img class="small_loading" src="~/Content/GIF/small_loading.gif">
+        </li>
         <li class="tic" id="1_0"></li>
         <li class="tic" id="1_1"></li>
         <li class="tic" id="1_2"></li>
-        <li class="tic" id="12" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[5].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[5].Club.ClubName" /></li>
+        <li class="tic" id="6" style="background: none;">
+            <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[5].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[5].Club.ClubName" />
+            <img class="small_loading" src="~/Content/GIF/small_loading.gif">
+        </li>
         <li class="tic" id="2_0"></li>
         <li class="tic" id="2_1"></li>
         <li class="tic" id="2_2"></li>
     </ul>
     <div class="clearfix"></div>
 </div>
-<div class="container">
+<div class="autocomplete_container">
     <div class="searchInput">
         <input type="text" placeholder="Player name" id="playerName">
         <div class="resultBox">

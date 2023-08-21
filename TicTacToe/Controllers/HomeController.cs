@@ -121,10 +121,11 @@ namespace TicTacToe.Controllers
             Game game = _context.Games.Where(g => g.GameId == gameId)
                                     .Include(g => g.Rounds)
                                     .ThenInclude(r => r.RoundClubs)
+                                    .Include(g=>g.Rounds)
+                                    .ThenInclude(r=>r.RoundMoves)
                                     .First();
 
             game.Rounds.OrderByDescending(r=>r.RoundNo).First().RoundClubs.Clear();
-            //nuk fshihen
             game.Rounds.OrderByDescending(r => r.RoundNo).First().RoundMoves.Clear();
 
             foreach (RoundClub club in SelectClubsForRound())
