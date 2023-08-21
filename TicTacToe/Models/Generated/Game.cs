@@ -19,8 +19,6 @@ public partial class Game
 
     public bool? IsP1Winner { get; set; }
 
-    public virtual ICollection<GameClub> GameClubs { get; set; } = new List<GameClub>();
-
     public virtual User P1User { get; set; } = null!;
 
     public virtual User? P2User { get; set; }

@@ -90,6 +90,7 @@ $(".tic").click(function () {
                 else {
                     $(".tic").css("pointer-events", "none");
                     $("#playerName").prop("disabled", true);
+                    $("#changeClubs").prop("disabled", true);
                     $("#playerName").val("")
                     $("#playerId").val("");
                     $("#message").text("");
@@ -117,3 +118,19 @@ function showSuggestions(list) {
     }
     resultBox.innerHTML = listData;
 }
+$("#changeClubs").click(function () {
+    $.ajax({
+        type: "GET",
+        url: "/Home/changeRoundClubs/",
+        contentType: 'application/json; charset=utf-8',
+        datatype: 'json',
+        data: {
+            gameId: $("#GameId").val(),
+        },
+        success: function (data) {
+
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+        }
+    });
+});

@@ -2,17 +2,22 @@
 {
     public class ApiPlayer
     {
-        public int id { get; set; }
+        public string url { get; set; }
+        public string id { get; set; }
         public string name { get; set; }
-        public string firstname { get; set; }
-        public string lastname { get; set; }
-        public int? age { get; set; }
-        public Birth birth { get; set; }
-        public string nationality { get; set; }
+        public string fullname { get; set; }
+
+        public string nameInHomeCountry { get; set; }
+        public string imageURL { get; set; }
+        public string dateOfBirth { get; set; }
+        public string age { get; set; }
         public string height { get; set; }
-        public string weight { get; set; }
-        public bool injured { get; set; }
-        public string photo { get; set; }
+        public List<string> citizenship { get; set; }
+        public bool isRetired { get; set; }
+        public string retiredSince { get; set; }
+        public string foot { get; set; }
+        public Club club { get; set; }
+        public DateTime lastUpdate { get; set; }
     }
     public class Birth
     {

@@ -54,23 +54,23 @@ namespace TicTacToe.Controllers
                 _context.SaveChanges();
         }
 
-        public void FillPlayerDetailsDataSet()
-        {
-            foreach (var player in _context.Players.ToList())
-            {
-                var playerDetails = _getData.GetPlayerDetails(Convert.ToInt32(player.ApiPlayerId));
-                player.PlayerName = playerDetails.Result.response.First().player.firstname.Split(' ')[0] + " " + playerDetails.Result.response.First().player.lastname;
-                player.Birthdate = DateTime.ParseExact(playerDetails.Result.response.First().player.birth.date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
-            }
-            _context.SaveChanges();
-        }
+        //public void FillPlayerDetailsDataSet()
+        //{
+        //    foreach (var player in _context.Players.ToList())
+        //    {
+        //        var playerDetails = _getData.GetPlayerDetails(Convert.ToInt32(player.ApiPlayerId));
+        //        player.PlayerName = playerDetails.Result.response.First().player.firstname.Split(' ')[0] + " " + playerDetails.Result.response.First().player.lastname;
+        //        player.Birthdate = DateTime.ParseExact(playerDetails.Result.response.First().player.birth.date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+        //    }
+        //    _context.SaveChanges();
+        //}
 
         public void CreatePlayerClubHistoryDataSet()
         {
             int i = 1;
-            foreach (var player in _context.Players.ToList().Where(p=>p.PlayerId>187))
+            foreach (var player in _context.Players.ToList().Where(p=>p.PlayerId> 596))
             {
-                if (i <= 10)
+                if (i <= 13)
                 {
                     var allhistoryPlayer = _getData.GetPlayerClubHistory(Convert.ToInt32(player.ApiPlayerId));
                     i++;
@@ -107,6 +107,24 @@ namespace TicTacToe.Controllers
                     break;
                 }
             }
+        }
+
+        public void CreatePlayerId()
+        {
+            List<int> retiredPlayers = new() { 65230,25557,26399,112465,5819,7912,30638,7717,5354,5962,7840,5759,6031,7600,58205,45403,43907,203412,5817,76061,50219,2540,5841,5922,5866,
+                                               3524,131789,7518,3185,34870,112302,75,15185,29835,266302,7589,28021,5299,7427,92141,33873,45146,74418,2904,8024,5794,6081,318077,77,77100,
+                                               26721,41414,5588,179184,1397,88994,2963,12142};
+            foreach (int id in retiredPlayers)
+            {
+                var allteamPlayers = _getData.GetPlayersById(id);
+
+                Player playerModel = new Player();
+                playerModel.ApiPlayerId = id.ToString();
+                playerModel.Birthdate = Convert.ToDateTime(allteamPlayers.Result.dateOfBirth);
+                playerModel.PlayerName = !String.IsNullOrWhiteSpace(allteamPlayers.Result.nameInHomeCountry) ? allteamPlayers.Result.nameInHomeCountry : !String.IsNullOrWhiteSpace(allteamPlayers.Result.fullname) ? allteamPlayers.Result.fullname : allteamPlayers.Result.name;
+                _context.Players.Add(playerModel);
+            }
+            _context.SaveChanges();
         }
     }
 }

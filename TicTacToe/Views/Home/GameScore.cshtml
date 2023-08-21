@@ -1,0 +1,13 @@
+﻿@using TicTacToe.Models
+
+@model Game
+<div class="wrapper">
+    <div class="scoreboard-outer">
+        <span class="team-name one">@Model.P1User.UserName</span>
+        <div class="score-panel">
+            <span class="score team1">@Model.RoundsWonByFirstPlayer</span>
+            <span class="score team2">@Model.RoundsWonBySecondPlayer</span>
+        </div>
+        <span class="team-name two">@Model.P2User.UserName</span>
+    </div>
+</div>

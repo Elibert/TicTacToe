@@ -46,10 +46,22 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
         slideout.classList.toggle('visible');
         $(".tic").css("pointer-events", "auto");
         $("#playerName").prop("disabled", false);
+        $("#changeClubs").prop("disabled", false);
         $("#playerName").val("")
         $("#message").text("");
     }
 });
 connection.on("selectedPlayer", (playerName) => {
     $("#message").text("Opponent selected " + playerName);
+});
+connection.on("changeRoundClubs", (newRoundClubs) => {
+    for (var i = 0; i < Object.keys(newRoundClubs).length; i++) {
+        $("#" + parseInt(i + 1) + " img").attr("alt", Object.keys(newRoundClubs)[i])
+        $("#" + parseInt(i + 1) + " img").attr("src", Object.values(newRoundClubs)[i])
+    }
+    for (var i = 0; i <= 2; i++) {
+        for (var j = 0; j <= 2; j++) {
+            $("#"+i+"_"+j).text('');
+        }
+    }
 });

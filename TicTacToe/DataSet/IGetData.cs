@@ -12,5 +12,6 @@ namespace TicTacToe.DataSet
 
         public Task<GetPlayer> GetPlayerDetails(int playerId);
 
+        public Task<ApiPlayer> GetPlayersById(int playerId);
     }
 }

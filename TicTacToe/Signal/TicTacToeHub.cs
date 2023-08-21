@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using TicTacToe.Data;
 using TicTacToe.Models;
 
@@ -82,6 +83,19 @@ namespace TicTacToe.Signal
         public async Task SelectedPlayer(int userId, string playerName)
         {
             await Clients.Client(GetConnectionId(userId)).SendAsync("selectedPlayer", playerName);
+        }
+
+        public async Task ChangeClubs(int P1UserId, int P2UserId, Dictionary<string, string> newRoundClubs)
+        {
+            List<int> usersToChangeClubs = new();
+            List<string> connIds = new();
+
+            usersToChangeClubs.Add(P1UserId);
+            usersToChangeClubs.Add(P2UserId);
+            foreach(int userId in usersToChangeClubs)
+                connIds.Add(GetConnectionId(userId));
+
+            await Clients.Clients(connIds).SendAsync("changeRoundClubs", newRoundClubs);
         }
 
         public string GetConnectionId(int userId)

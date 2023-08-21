@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TicTacToe.Models;
 
-public partial class GameMove
+public partial class RoundMove
 {
     public int MoveId { get; set; }
 

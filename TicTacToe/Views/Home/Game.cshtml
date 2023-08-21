@@ -3,9 +3,6 @@
 @model Game
 
 <script src="@Url.Content("~/js/Views/Home/Game.js")" type="text/javascript" defer="defer"></script>
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/SignalRfunctions.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.12/signalr.min.js"></script>
 
 <div hidden>
     @Html.HiddenFor(model=>model.GameId)
@@ -15,8 +12,34 @@
     @Html.HiddenFor(model=>model.P1User.UserName, new{@id="P1UserName"})
     @Html.HiddenFor(model=>model.P2User.UserName, new{@id="P2UserName"})
 </div>
-
+<div class="button-container">
+    <button class="button secondary" id="changeClubs">Change Clubs</button>
+</div>
+@Html.Partial("~/Views/Home/GameScore.cshtml")
 <div id="notif">Your turn!</div>
+
+<div class="text-center" id="box">
+    <div id="message"></div>
+    <ul id="gameBoard">
+        <li class="tic" id="0" style="background: none;"></li>
+        <li class="tic" id="1" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[0].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[0].Club.ClubName" /></li>
+        <li class="tic" id="2" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[1].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[1].Club.ClubName" /></li>
+        <li class="tic" id="3" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[2].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[2].Club.ClubName" /></li>
+        <li class="tic" id="4" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[3].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[3].Club.ClubName" /></li>
+        <li class="tic" id="0_0"></li>
+        <li class="tic" id="0_1"></li>
+        <li class="tic" id="0_2"></li>
+        <li class="tic" id="8" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[4].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[4].Club.ClubName" /></li>
+        <li class="tic" id="1_0"></li>
+        <li class="tic" id="1_1"></li>
+        <li class="tic" id="1_2"></li>
+        <li class="tic" id="12" style="background: none;"><img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[5].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[5].Club.ClubName" /></li>
+        <li class="tic" id="2_0"></li>
+        <li class="tic" id="2_1"></li>
+        <li class="tic" id="2_2"></li>
+    </ul>
+    <div class="clearfix"></div>
+</div>
 <div class="container">
     <div class="searchInput">
         <input type="text" placeholder="Player name" id="playerName">
@@ -25,26 +48,4 @@
         <div class="icon"><i class="fas fa-search"></i></div>
     </div>
 </div>
-<input id="playerId" type="hidden"/>
-<div class="text-center" id="box">
-    <div id="message"></div>
-    <ul id="gameBoard">
-        <li class="tic" id="0" style="background: none;"></li>
-        <li class="tic" id="1" style="background: none;"><img class="clubLogo" src="@Model.GameClubs.ToList()[0].Club.ClubLogo" /></li>
-        <li class="tic" id="2" style="background: none;"><img class="clubLogo" src="@Model.GameClubs.ToList()[1].Club.ClubLogo" /></li>
-        <li class="tic" id="3" style="background: none;"><img class="clubLogo" src="@Model.GameClubs.ToList()[2].Club.ClubLogo" /></li>
-        <li class="tic" id="4" style="background: none;"><img class="clubLogo" src="@Model.GameClubs.ToList()[3].Club.ClubLogo" /></li>
-        <li class="tic" id="0_0"></li>
-        <li class="tic" id="0_1"></li>
-        <li class="tic" id="0_2"></li>
-        <li class="tic" id="8" style="background: none;"><img class="clubLogo" src="@Model.GameClubs.ToList()[4].Club.ClubLogo" /></li>
-        <li class="tic" id="1_0"></li>
-        <li class="tic" id="1_1"></li>
-        <li class="tic" id="1_2"></li>
-        <li class="tic" id="12" style="background: none;"><img class="clubLogo" src="@Model.GameClubs.ToList()[5].Club.ClubLogo" /></li>
-        <li class="tic" id="2_0"></li>
-        <li class="tic" id="2_1"></li>
-        <li class="tic" id="2_2"></li>
-    </ul>
-    <div class="clearfix"></div>
-</div>
+<input id="playerId" type="hidden" />

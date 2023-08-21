@@ -25,7 +25,7 @@ namespace TicTacToe.Helpers
                 return result.ToString();
             }
         }
-        public static bool CheckIfThereIsAnyWinner(List<GameMove> gameMoves, TicTacToeTypes player)
+        public static bool CheckIfThereIsAnyWinner(List<RoundMove> gameMoves, TicTacToeTypes player)
         {
             int[] boardArray = new int[9];
             int counterIndex = 0;
@@ -33,7 +33,7 @@ namespace TicTacToe.Helpers
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    List<GameMove> moves = gameMoves.Where(gm => gm.RowNo == i && gm.ColNo == j).ToList();
+                    List<RoundMove> moves = gameMoves.Where(gm => gm.RowNo == i && gm.ColNo == j).ToList();
                     boardArray[counterIndex] = moves.Count() > 0 ? moves.First().CellValue : 2;
                     counterIndex++;
                 }
