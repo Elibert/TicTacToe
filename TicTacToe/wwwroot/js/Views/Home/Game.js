@@ -95,7 +95,15 @@ $(".tic").click(function () {
                     $("#playerId").val("");
                     $("#message").text("");
                     if (data.correctMove) {
+                        var fontColor;
+                        if ($("#MoveType").val() == 'X') {
+                            fontColor = 'red';
+                        }
+                        else {
+                            fontColor = 'blue';
+                        }
                         $("#" + slot).text($("#MoveType").val());
+                        $("#" + slot).css('color', fontColor);
                     }
                     else {
                         alert("wrong move");

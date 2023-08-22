@@ -31,13 +31,17 @@ connection.start()
 
 connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinished) => {
     if (moveType != null) {
+        var fontColor;
         if (moveType == 0) {
             moveType = 'X';
+            fontColor = 'red';
         }
         else {
             moveType = 'O';
+            fontColor = 'blue';
         }
         $("#" + coordinateX + '_' + coordinateY).text(moveType);
+        $("#" + coordinateX + '_' + coordinateY).css('color', fontColor);
     }
     if (isRoundFinished) {
     }
