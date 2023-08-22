@@ -17,5 +17,7 @@ public partial class Round
 
     public virtual Game Game { get; set; } = null!;
 
-    public virtual ICollection<GameMove> GameMoves { get; set; } = new List<GameMove>();
+    public virtual ICollection<RoundClub> RoundClubs { get; set; } = new List<RoundClub>();
+
+    public virtual ICollection<RoundMove> RoundMoves { get; set; } = new List<RoundMove>();
 }

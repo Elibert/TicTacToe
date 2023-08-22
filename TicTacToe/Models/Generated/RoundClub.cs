@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace TicTacToe.Models;
 
-public partial class GameClub
+public partial class RoundClub
 {
     public int GameClubId { get; set; }
 
-    public int GameId { get; set; }
+    public int RoundId { get; set; }
 
     public int ClubId { get; set; }
 
@@ -17,5 +17,5 @@ public partial class GameClub
 
     public virtual Club Club { get; set; } = null!;
 
-    public virtual Game Game { get; set; } = null!;
+    public virtual Round Round { get; set; } = null!;
 }

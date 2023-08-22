@@ -90,11 +90,20 @@ $(".tic").click(function () {
                 else {
                     $(".tic").css("pointer-events", "none");
                     $("#playerName").prop("disabled", true);
+                    $("#changeClubs").prop("disabled", true);
                     $("#playerName").val("")
                     $("#playerId").val("");
                     $("#message").text("");
                     if (data.correctMove) {
+                        var fontColor;
+                        if ($("#MoveType").val() == 'X') {
+                            fontColor = 'red';
+                        }
+                        else {
+                            fontColor = 'blue';
+                        }
                         $("#" + slot).text($("#MoveType").val());
+                        $("#" + slot).css('color', fontColor);
                     }
                     else {
                         alert("wrong move");
@@ -117,3 +126,27 @@ function showSuggestions(list) {
     }
     resultBox.innerHTML = listData;
 }
+$("#changeClubs").click(function () {
+    $.ajax({
+        type: "GET",
+        url: "/Home/changeRoundClubs/",
+        contentType: 'application/json; charset=utf-8',
+        datatype: 'json',
+        beforeSend: function () {
+            $('.small_loading').show();
+            $('.clubLogo').hide();
+        },
+        data: {
+            gameId: $("#GameId").val(),
+        },
+        success: function (data) {
+
+        },
+        complete: function(){
+            $('.small_loading').hide();
+            $('.clubLogo').show();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+        }
+    });
+});

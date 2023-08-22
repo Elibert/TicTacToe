@@ -13,7 +13,7 @@ public partial class Club
 
     public string? ApiTeamId { get; set; }
 
-    public virtual ICollection<GameClub> GameClubs { get; set; } = new List<GameClub>();
-
     public virtual ICollection<PlayerClubHistory> PlayerClubHistories { get; set; } = new List<PlayerClubHistory>();
+
+    public virtual ICollection<RoundClub> RoundClubs { get; set; } = new List<RoundClub>();
 }

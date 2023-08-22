@@ -68,16 +68,17 @@ function joinRoom(playerId) {
                 playerId: playerId,
                 gameCode:gameCode
             },
-            beforeSend: function () { $('#loading-container').show(); },
+            beforeSend: function () { $('#waiting_toJoin_bar').show(); },
             success: function (data) {
                 $("#content").html(data);
                 $(".tic").css("pointer-events", "none");
                 $("#playerName").prop("disabled", true);
+                $("#changeClubs").prop("disabled", true);
             },
             error: function (xhr, ajaxOptions, thrownError) {
             },
             complete: function () {
-                $('#loading-container').hide();  
+                $('#waiting_toJoin_bar').hide();  
             }
         });
     }

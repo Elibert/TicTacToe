@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml.Linq;
 using TicTacToe.Data;
 using TicTacToe.Helpers;
 using TicTacToe.Models;
@@ -70,10 +71,10 @@ namespace TicTacToe.Controllers
         public ActionResult ConnGame(int gameId)
         {
             Game game = _context.Games.Where(p => p.GameId == gameId).Include(g=>g.Rounds)
+                                                                     .ThenInclude(r=>r.RoundClubs)
+                                                                     .ThenInclude(rc => rc.Club)
                                                                      .Include(g=>g.P1User)
-                                                                     .Include(g=>g.P2User)
-                                                                     .Include(g=>g.GameClubs)
-                                                                     .ThenInclude(gc => gc.Club).First();
+                                                                     .Include(g=>g.P2User).First();
             game.OpponentUserId = (int)game.P2UserId;
             game.MoveType = TicTacToeTypes.X;
             return PartialView("Game", game);
@@ -88,46 +89,18 @@ namespace TicTacToe.Controllers
                     game.P2UserId = playerId;
                     game.OpponentUserId = game.P1UserId;
                     game.IsBeingPlayed = true;
-                    GameClub gameClub=new();
-                    List<Club> allClubs = _context.Clubs.ToList();
-                    List<Club> selectedClubs = new List<Club>();
-                    List<Club> possibleClubsForVerticalAlign = new List<Club>();
-                    int r;
-                    for (int i = 0; i <= 3; i++)
-                    {
-                        if (i == 0)
-                        {
-                            do
-                            {
-                                selectedClubs.Clear();
-                                game.GameClubs.Clear();
-                                SelectThreeTeams(game, gameClub, selectedClubs, allClubs);
-                                string club_ids = String.Join(",", game.GameClubs.Where(p => p.RowNo == i).Select(c => c.ClubId).ToList());
-                                possibleClubsForVerticalAlign = _context.Clubs.FromSqlInterpolated($"Generate_Possible_Clubs {club_ids}").ToList();
-                            }
-                            while (possibleClubsForVerticalAlign.Count() < 3);
-                        }
-                        else
-                        {
-
-                            List<Club> possibleClubThatCanBeSelected = possibleClubsForVerticalAlign.Except(selectedClubs).ToList();
-                            r = rnd.Next(possibleClubThatCanBeSelected.Count() - 1);
-                            selectedClubs.Add(possibleClubThatCanBeSelected[r]);
-                            gameClub = new GameClub();
-                            gameClub.ClubId = possibleClubThatCanBeSelected[r].ClubId;
-                            gameClub.ColNo = 0;
-                            gameClub.RowNo = i;
-                            game.GameClubs.Add(gameClub);
-                        }
-                    }
                     game.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = 1 });
+                    Round currentRound = game.CurrentRound;
+                    foreach (RoundClub selectedClub in SelectClubsForRound())
+                        currentRound.RoundClubs.Add(selectedClub);
+
                     game.MoveType = TicTacToeTypes.O;
                     _context.SaveChanges();
-                    game = _context.Games.Where(g => g.GameCode == gameCode).Include(g => g.GameClubs)
-                                                                            .ThenInclude(gc => gc.Club)
-                                                                            .Include(g => g.P1User)
+                    game = _context.Games.Where(g => g.GameCode == gameCode).Include(g => g.P1User)
                                                                             .Include(g => g.P2User)                                                                                     
-                                                                            .Include(g => g.Rounds).First();
+                                                                            .Include(g => g.Rounds)
+                                                                            .ThenInclude(r => r.RoundClubs)
+                                                                            .ThenInclude(rc => rc.Club).First();
                     signal.EnterGame(_context.Games.Where(g => g.GameCode == gameCode).First().GameId);
                     return PartialView("Game", game);
                 }
@@ -142,7 +115,72 @@ namespace TicTacToe.Controllers
             }
         }
 
-        public void SelectThreeTeams(Game game, GameClub gameClub, List<Club> selectedClubs, List<Club> clubs)
+        public void changeRoundClubs(int gameId)
+        {
+            Dictionary<string, string> newRoundClubs = new();
+            Game game = _context.Games.Where(g => g.GameId == gameId)
+                                    .Include(g => g.Rounds)
+                                    .ThenInclude(r => r.RoundClubs)
+                                    .Include(g=>g.Rounds)
+                                    .ThenInclude(r=>r.RoundMoves)
+                                    .First();
+
+            game.Rounds.OrderByDescending(r=>r.RoundNo).First().RoundClubs.Clear();
+            game.Rounds.OrderByDescending(r => r.RoundNo).First().RoundMoves.Clear();
+
+            foreach (RoundClub club in SelectClubsForRound())
+                game.Rounds.OrderByDescending(r => r.RoundNo).First().RoundClubs.Add(club);
+
+            _context.SaveChanges();
+
+            game = _context.Games.Where(g => g.GameId == gameId)
+                                    .Include(g => g.Rounds)
+                                    .ThenInclude(r => r.RoundClubs)
+                                    .ThenInclude(r=>r.Club)
+                                    .First();
+
+            foreach (var item in game.CurrentRoundClubs)
+                newRoundClubs.Add(item.Club.ClubName,item.Club.ClubLogo);
+
+            signal.ChangeRoundClubs(game.P1UserId,(int)game.P2UserId, newRoundClubs);
+        }
+
+        public List<RoundClub> SelectClubsForRound()
+        {
+            List<RoundClub> choosenGameClubs = new List<RoundClub>();
+            List<Club> allClubs = _context.Clubs.ToList();
+            List<Club> selectedClubs = new List<Club>();
+            List<Club> possibleClubsForVerticalAlign = new List<Club>();
+            int r;
+            for (int i = 0; i <= 3; i++)
+            {
+                if (i == 0)
+                {
+                    do
+                    {
+                        selectedClubs.Clear();
+                        choosenGameClubs.Clear();
+                        SelectThreeTeams(choosenGameClubs, selectedClubs, allClubs);
+                        string club_ids = String.Join(",", choosenGameClubs.Where(p => p.RowNo == i).Select(c => c.ClubId).ToList());
+                        possibleClubsForVerticalAlign = _context.Clubs.FromSqlInterpolated($"Generate_Possible_Clubs {club_ids}").ToList();
+                    }
+                    while (possibleClubsForVerticalAlign.Count() < 3);
+                }
+                else
+                {
+                    List<Club> possibleClubThatCanBeSelected = possibleClubsForVerticalAlign.Except(selectedClubs).ToList();
+                    r = rnd.Next(possibleClubThatCanBeSelected.Count() - 1);
+                    selectedClubs.Add(possibleClubThatCanBeSelected[r]);
+                    RoundClub gameClub = new RoundClub();
+                    gameClub.ClubId = possibleClubThatCanBeSelected[r].ClubId;
+                    gameClub.ColNo = 0;
+                    gameClub.RowNo = i;
+                    choosenGameClubs.Add(gameClub);
+                }
+            }
+            return choosenGameClubs;
+        }
+        public void SelectThreeTeams(List<RoundClub> gameC, List<Club> selectedClubs, List<Club> clubs)
         {
             int r;
             for (int j = 1; j <= 3; j++)
@@ -150,11 +188,11 @@ namespace TicTacToe.Controllers
                 r = rnd.Next(clubs.Count() - selectedClubs.Count() - 1);
                 Club club = clubs.Except(selectedClubs).ToList()[r];
                 selectedClubs.Add(club);
-                gameClub = new GameClub();
+                RoundClub gameClub = new RoundClub();
                 gameClub.ClubId = club.ClubId;
                 gameClub.ColNo = j;
                 gameClub.RowNo = 0;
-                game.GameClubs.Add(gameClub);
+                gameC.Add(gameClub);
             }
         }
         [HttpGet]
@@ -162,25 +200,29 @@ namespace TicTacToe.Controllers
         {
             if(_context.Games.Where(g=>g.GameId==GameId && g.IsBeingPlayed).Count()>0)
             {
-                Game thisGame = _context.Games.Where(g => g.GameId == GameId).Include(p => p.Rounds).ThenInclude(p=>p.GameMoves).Include(g=>g.GameClubs).First();
+                Game thisGame = _context.Games.Where(g => g.GameId == GameId)
+                    .Include(p => p.Rounds)
+                    .ThenInclude(rc=>rc.RoundClubs)
+                    .Include(g=>g.Rounds)
+                    .ThenInclude(p=>p.RoundMoves).First();
                 if (!thisGame.IsFinished)
                 {
                     Round actualRound = thisGame.Rounds.Where(r=>!(bool)r.IsFinished).OrderByDescending(r => r.RoundNo).First();
-                    List<GameClub> gameClubsForTheMove =
-                        thisGame.GameClubs.Where(gc => gc.ColNo == CoordinateY+1 || gc.RowNo == CoordinateX+1).ToList();
+                    List<RoundClub> gameClubsForTheMove =
+                        thisGame.CurrentRoundClubs.Where(gc => gc.ColNo == CoordinateY+1 || gc.RowNo == CoordinateX+1).ToList();
 
                     bool hasPlayerPlayedForFirstClub = _context.PlayerClubHistories.Where(p => p.PlayerId == PlayerId && p.ClubId == gameClubsForTheMove[0].ClubId).Count() > 0;
                     bool hasPlayerPlayedForSecondClub = _context.PlayerClubHistories.Where(p => p.PlayerId == PlayerId && p.ClubId == gameClubsForTheMove[1].ClubId).Count() > 0;
                     if (hasPlayerPlayedForFirstClub && hasPlayerPlayedForSecondClub)
-                        actualRound.GameMoves.Add(new GameMove { ColNo = CoordinateY, RowNo = CoordinateX, CellValue = (int)Movetype });
+                        thisGame.CurrentRound.RoundMoves.Add(new RoundMove { ColNo = CoordinateY, RowNo = CoordinateX, CellValue = (int)Movetype });
                     else
                     {
                         signal.MakeMove(Movetype == TicTacToeTypes.X ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false);
                         return Json(new { correctMove = false, finishedRound = false });
                     }
 
-                    bool isFirstPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.X);
-                    bool isSecondPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(actualRound.GameMoves.ToList(), TicTacToeTypes.O);
+                    bool isFirstPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
+                    bool isSecondPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
 
                     if (isFirstPlayerWinner || isSecondPlayerWinner)
                         actualRound.IsFinished = true;  

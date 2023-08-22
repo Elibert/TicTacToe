@@ -20,15 +20,15 @@ public partial class TictactoeContext : DbContext
 
     public virtual DbSet<Game> Games { get; set; }
 
-    public virtual DbSet<GameClub> GameClubs { get; set; }
-
-    public virtual DbSet<GameMove> GameMoves { get; set; }
-
     public virtual DbSet<Player> Players { get; set; }
 
     public virtual DbSet<PlayerClubHistory> PlayerClubHistories { get; set; }
 
     public virtual DbSet<Round> Rounds { get; set; }
+
+    public virtual DbSet<RoundClub> RoundClubs { get; set; }
+
+    public virtual DbSet<RoundMove> RoundMoves { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -80,45 +80,6 @@ public partial class TictactoeContext : DbContext
                 .HasConstraintName("FK_Game_Game");
         });
 
-        modelBuilder.Entity<GameClub>(entity =>
-        {
-            entity.ToTable("Game_Club");
-
-            entity.Property(e => e.GameClubId).HasColumnName("game_club_id");
-            entity.Property(e => e.ClubId).HasColumnName("club_id");
-            entity.Property(e => e.ColNo).HasColumnName("col_no");
-            entity.Property(e => e.GameId).HasColumnName("game_id");
-            entity.Property(e => e.RowNo).HasColumnName("row_no");
-
-            entity.HasOne(d => d.Club).WithMany(p => p.GameClubs)
-                .HasForeignKey(d => d.ClubId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Game_Club_Club");
-
-            entity.HasOne(d => d.Game).WithMany(p => p.GameClubs)
-                .HasForeignKey(d => d.GameId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Game_Club_Game");
-        });
-
-        modelBuilder.Entity<GameMove>(entity =>
-        {
-            entity.HasKey(e => e.MoveId);
-
-            entity.ToTable("Game_Moves");
-
-            entity.Property(e => e.MoveId).HasColumnName("move_id");
-            entity.Property(e => e.CellValue).HasColumnName("cellValue");
-            entity.Property(e => e.ColNo).HasColumnName("colNo");
-            entity.Property(e => e.RoundId).HasColumnName("round_id");
-            entity.Property(e => e.RowNo).HasColumnName("rowNo");
-
-            entity.HasOne(d => d.Round).WithMany(p => p.GameMoves)
-                .HasForeignKey(d => d.RoundId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Game_Moves_Game");
-        });
-
         modelBuilder.Entity<Player>(entity =>
         {
             entity.ToTable("Player");
@@ -166,6 +127,50 @@ public partial class TictactoeContext : DbContext
                 .HasForeignKey(d => d.GameId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Rounds_Game");
+        });
+
+        modelBuilder.Entity<RoundClub>(entity =>
+        {
+            entity.HasKey(e => e.GameClubId).HasName("PK_Game_Club");
+
+            entity.ToTable("Round_Club");
+
+            entity.Property(e => e.GameClubId).HasColumnName("game_club_id");
+            entity.Property(e => e.ClubId).HasColumnName("club_id");
+            entity.Property(e => e.ColNo).HasColumnName("col_no");
+            entity.Property(e => e.RoundId).HasColumnName("round_id");
+            entity.Property(e => e.RowNo).HasColumnName("row_no");
+
+            entity.HasOne(d => d.Club).WithMany(p => p.RoundClubs)
+                .HasForeignKey(d => d.ClubId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_Club_Club");
+                
+
+            entity.HasOne(d => d.Round).WithMany(p => p.RoundClubs)
+                .HasForeignKey(d => d.RoundId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_Club_Game")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RoundMove>(entity =>
+        {
+            entity.HasKey(e => e.MoveId).HasName("PK_Game_Moves");
+
+            entity.ToTable("Round_Moves");
+
+            entity.Property(e => e.MoveId).HasColumnName("move_id");
+            entity.Property(e => e.CellValue).HasColumnName("cellValue");
+            entity.Property(e => e.ColNo).HasColumnName("colNo");
+            entity.Property(e => e.RoundId).HasColumnName("round_id");
+            entity.Property(e => e.RowNo).HasColumnName("rowNo");
+
+            entity.HasOne(d => d.Round).WithMany(p => p.RoundMoves)
+                .HasForeignKey(d => d.RoundId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Game_Moves_Game")
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<User>(entity =>

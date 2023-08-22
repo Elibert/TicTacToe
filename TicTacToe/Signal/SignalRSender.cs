@@ -67,5 +67,21 @@ namespace TicTacToe.Signal
                 }
             }).Wait();
         }
+
+        public void ChangeRoundClubs(int P1UserId, int P2UserId, Dictionary<string, string> newRoundClubs)
+        {
+            connection.StartAsync().ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    //Do something if the connection failed
+                }
+                else
+                {
+                    //if connection is successfull, do something
+                    connection.InvokeAsync("ChangeClubs", P1UserId, P2UserId, newRoundClubs);
+                }
+            }).Wait();
+        }
     }
 }
