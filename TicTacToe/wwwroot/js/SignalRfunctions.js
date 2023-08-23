@@ -14,6 +14,8 @@ connection.on("ChangeScreenEnterGame", (gameId) => {
         beforeSend: function () { $('#loading-container').show(); },
         success: function (data) {
             $("#content").html(data);
+            $('#p1timer').text("1:00");
+            countdown("p1timer", "p2timer");
         },
         error: function (xhr, ajaxOptions, thrownError) {
         },
@@ -29,7 +31,7 @@ connection.start()
     })
     .catch(err => console.error(err));
 
-connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinished) => {
+connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinished, activetimer) => {
     if (moveType != null) {
         var fontColor;
         if (moveType == 0) {
@@ -46,6 +48,13 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
     if (isRoundFinished) {
     }
     else {
+        var nonactivetimer;
+        if (activetimer == "p1timer") {
+            nonactivetimer = "p2timer";
+        }
+        else {
+            nonactivetimer = "p1timer";
+        }
         var slideout = document.getElementById('notif');
         slideout.classList.toggle('visible');
         $(".tic").css("pointer-events", "auto");
@@ -53,6 +62,12 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
         $("#changeClubs").prop("disabled", false);
         $("#playerName").val("")
         $("#message").text("");
+
+        $("#" + nonactivetimer).css("display", "none");
+        $("#" + activetimer).css("display", "block");
+        $('#' + activetimer).text("1:00");
+        
+        countdown(activetimer, nonactivetimer);
     }
 });
 connection.on("selectedPlayer", (playerName) => {

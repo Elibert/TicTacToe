@@ -34,7 +34,7 @@ namespace TicTacToe.Signal
             }).Wait();
         }
 
-        public void MakeMove(int userId, int coordinateX, int coordinateY, TicTacToeTypes? moveType, bool isRoundFinished)
+        public void MakeMove(int userId, int? coordinateX, int? coordinateY, TicTacToeTypes? moveType, bool isRoundFinished, string activetimer)
         {
             connection.StartAsync().ContinueWith(task =>
             {
@@ -45,7 +45,7 @@ namespace TicTacToe.Signal
                 else
                 {
                     //if connection is successfull, do something
-                    connection.InvokeAsync("MakeMove",userId, coordinateX, coordinateY, moveType, isRoundFinished);
+                    connection.InvokeAsync("MakeMove",userId, coordinateX, coordinateY, moveType, isRoundFinished, activetimer);
 
                 }
             }).Wait();

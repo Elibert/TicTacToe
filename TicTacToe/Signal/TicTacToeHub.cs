@@ -76,9 +76,9 @@ namespace TicTacToe.Signal
            await Clients.Client(GetConnectionId(userId)).SendAsync("ChangeScreenEnterGame", gameId);
         }
 
-        public async Task MakeMove(int userId, int coordinateX, int coordinateY, TicTacToeTypes? moveType, bool isRoundfinished)
+        public async Task MakeMove(int userId, int? coordinateX, int? coordinateY, TicTacToeTypes? moveType, bool isRoundfinished, string activetimer)
         {
-            await Clients.Client(GetConnectionId(userId)).SendAsync("changeTurns", coordinateX, coordinateY, moveType, isRoundfinished);
+            await Clients.Client(GetConnectionId(userId)).SendAsync("changeTurns", coordinateX, coordinateY, moveType, isRoundfinished, activetimer);
         }
         public async Task SelectedPlayer(int userId, string playerName)
         {
