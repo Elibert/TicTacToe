@@ -76,6 +76,7 @@ function joinRoom(playerId) {
                 $("#changeClubs").prop("disabled", true);
                 $('#p1timer').text("1:00");
                 countdown("p1timer","p2timer");
+                window.history.pushState(null, '', '/Home/Game?gamecode='+gameCode);
             },
             error: function (xhr, ajaxOptions, thrownError) {
             },

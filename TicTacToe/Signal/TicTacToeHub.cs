@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using TicTacToe.Data;
+using TicTacToe.Helpers;
 using TicTacToe.Models;
 
 namespace TicTacToe.Signal
@@ -15,21 +16,15 @@ namespace TicTacToe.Signal
         {
             context = tictactoeContext;
         }
-        //public override async Task OnConnectedAsync()
-        //{
-        //    string userIdentifier = Context.GetHttpContext().Request.Query["userId"];
+        public override async Task OnConnectedAsync()
+        {
+            string user = Context.GetHttpContext().Request.Cookies["UC"];
 
-        //    if (!string.IsNullOrEmpty(userIdentifier))
-        //    {
-        //        if (!_userConnections.ContainsKey(userIdentifier))
-        //        {
-        //            _userConnections[userIdentifier] = new HashSet<string>();
-        //        }
-        //        _userConnections[userIdentifier].Add(Context.ConnectionId);
-        //    }
+            if (!string.IsNullOrWhiteSpace(user))
+                FunctionHelper.ChangeUserConnectionId(user,Context.ConnectionId,context);
 
-        //    await base.OnConnectedAsync();
-        //}
+            await base.OnConnectedAsync();
+        }
 
         //public override async Task OnDisconnectedAsync(Exception exception)
         //{

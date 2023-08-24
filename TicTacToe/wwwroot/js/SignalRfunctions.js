@@ -16,6 +16,7 @@ connection.on("ChangeScreenEnterGame", (gameId) => {
             $("#content").html(data);
             $('#p1timer').text("1:00");
             countdown("p1timer", "p2timer");
+            window.history.pushState(null, '', '/Home/Game?gamecode=' + $('#GameCode').val());
         },
         error: function (xhr, ajaxOptions, thrownError) {
         },
