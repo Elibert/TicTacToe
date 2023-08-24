@@ -121,6 +121,7 @@ public partial class TictactoeContext : DbContext
             entity.Property(e => e.GameId).HasColumnName("game_id");
             entity.Property(e => e.IsFinished).HasColumnName("is_finished");
             entity.Property(e => e.IsP1Win).HasColumnName("is_p1_win");
+            entity.Property(e => e.IsP1Turn).HasColumnName("is_p1_turn");
             entity.Property(e => e.RoundNo).HasColumnName("round_no");
 
             entity.HasOne(d => d.Game).WithMany(p => p.Rounds)

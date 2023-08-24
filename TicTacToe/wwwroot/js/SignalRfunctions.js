@@ -31,7 +31,7 @@ connection.start()
     })
     .catch(err => console.error(err));
 
-connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinished, activetimer) => {
+connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinished, isP1turn) => {
     if (moveType != null) {
         var fontColor;
         if (moveType == 0) {
@@ -48,11 +48,13 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
     if (isRoundFinished) {
     }
     else {
-        var nonactivetimer;
-        if (activetimer == "p1timer") {
+        var nonactivetimer, activetimer;
+        if (!isP1turn) {
+            activetimer = "p1timer";
             nonactivetimer = "p2timer";
         }
         else {
+            activetimer = "p2timer"
             nonactivetimer = "p1timer";
         }
         var slideout = document.getElementById('notif');
@@ -73,7 +75,7 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
 connection.on("selectedPlayer", (playerName) => {
     $("#message").text("Opponent selected " + playerName);
 });
-connection.on("changeRoundClubs", (newRoundClubs) => {
+connection.on("changeRoundClubs", (newRoundClubs, isP1turn) => {
     for (var i = 0; i < Object.keys(newRoundClubs).length; i++) {
         $("#" + parseInt(i + 1) + " .clubLogo").attr("alt", Object.keys(newRoundClubs)[i])
         $("#" + parseInt(i + 1) + " .clubLogo").attr("src", Object.values(newRoundClubs)[i])
@@ -83,4 +85,14 @@ connection.on("changeRoundClubs", (newRoundClubs) => {
             $("#"+i+"_"+j).text('');
         }
     }
+    var activetimer;
+    if (isP1turn) {
+        activetimer = "p1timer";
+    }
+    else {
+        activetimer = "p2timer"
+    }
+    $('#' + activetimer).text("1:00");
+
+    countdown(activetimer, nonactivetimer);
 });

@@ -89,7 +89,7 @@ namespace TicTacToe.Controllers
                     game.P2UserId = playerId;
                     game.OpponentUserId = game.P1UserId;
                     game.IsBeingPlayed = true;
-                    game.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = 1 });
+                    game.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = 1, IsP1Turn=true });
                     Round currentRound = game.CurrentRound;
                     foreach (RoundClub selectedClub in SelectClubsForRound())
                         currentRound.RoundClubs.Add(selectedClub);
@@ -142,7 +142,7 @@ namespace TicTacToe.Controllers
             foreach (var item in game.CurrentRoundClubs)
                 newRoundClubs.Add(item.Club.ClubName,item.Club.ClubLogo);
 
-            signal.ChangeRoundClubs(game.P1UserId,(int)game.P2UserId, newRoundClubs);
+            signal.ChangeRoundClubs(game.P1UserId,(int)game.P2UserId, newRoundClubs, game.CurrentRound.IsP1Turn.Value);
         }
 
         public List<RoundClub> SelectClubsForRound()
@@ -205,10 +205,14 @@ namespace TicTacToe.Controllers
                     .ThenInclude(rc=>rc.RoundClubs)
                     .Include(g=>g.Rounds)
                     .ThenInclude(p=>p.RoundMoves).First();
-                if(CoordinateX==null && CoordinateY == null)
+
+                bool currenTurnP1 = thisGame.CurrentRound.IsP1Turn.Value;
+                thisGame.CurrentRound.IsP1Turn = !thisGame.CurrentRound.IsP1Turn;
+                _context.SaveChanges();
+                if (CoordinateX==null && CoordinateY == null)
                 {
-                    signal.MakeMove(Movetype == TicTacToeTypes.X ? (int)thisGame.P2UserId : thisGame.P1UserId, null, null, null, false, Movetype == TicTacToeTypes.X ? "p2timer" : "p1timer");
-                    return Json(new { correctMove = false, finishedRound = false });
+                    signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, null, null, null, false, currenTurnP1);
+                    return Json(new { correctMove = false, finishedRound = false, isP1turn = currenTurnP1 });
                 }
                 if (!thisGame.IsFinished)
                 {
@@ -222,10 +226,9 @@ namespace TicTacToe.Controllers
                         thisGame.CurrentRound.RoundMoves.Add(new RoundMove { ColNo = (int)CoordinateY, RowNo = (int)CoordinateX, CellValue = (int)Movetype });
                     else
                     {
-                        signal.MakeMove(Movetype == TicTacToeTypes.X ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false, Movetype == TicTacToeTypes.X ? "p2timer" : "p1timer");
-                        return Json(new { correctMove = false, finishedRound = false });
+                        signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false, currenTurnP1);
+                        return Json(new { correctMove = false, finishedRound = false, isP1turn = currenTurnP1 });
                     }
-
                     bool isFirstPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
                     bool isSecondPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
 
@@ -248,12 +251,12 @@ namespace TicTacToe.Controllers
                         thisGame.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = roundNo });
                     }
                     _context.SaveChanges();
-                    signal.MakeMove(Movetype == TicTacToeTypes.X ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, Movetype, false, Movetype == TicTacToeTypes.X ? "p2timer" : "p1timer");
-                    return Json(new { correctMove = true, finishedRound = actualRound.IsFinished });
+                    signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, Movetype, false, currenTurnP1);
+                    return Json(new { correctMove = true, finishedRound = actualRound.IsFinished, isP1turn = currenTurnP1 });
                 }
                 else
                 {
-                    return Json(new { correctMove = false, finishedRound = true });
+                    return Json(new { correctMove = false, finishedRound = true, isP1turn = currenTurnP1 });
                 }
             }
             else

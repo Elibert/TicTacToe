@@ -94,6 +94,19 @@ $(".tic").click(function () {
                     $("#playerName").val("")
                     $("#playerId").val("");
                     $("#message").text("");
+                    var nonactivetimer, activetimer;
+                    if (!data.isP1turn) {
+                        activetimer = "p1timer"
+                        nonactivetimer = "p2timer";
+                    }
+                    else {
+                        activetimer = "p2timer"
+                        nonactivetimer = "p1timer";
+                    }
+                    $("#" + nonactivetimer).css("display", "none");
+                    $("#" + activetimer).css("display", "block");
+                    $("#" + activetimer).text("1:00");
+                    countdown(activetimer, nonactivetimer);
                     if (data.correctMove) {
                         var fontColor;
                         if ($("#MoveType").val() == 'X') {
