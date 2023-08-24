@@ -120,6 +120,7 @@ public partial class TictactoeContext : DbContext
             entity.Property(e => e.RoundId).HasColumnName("round_id");
             entity.Property(e => e.GameId).HasColumnName("game_id");
             entity.Property(e => e.IsFinished).HasColumnName("is_finished");
+            entity.Property(e => e.IsP1Turn).HasColumnName("is_p1_turn");
             entity.Property(e => e.IsP1Win).HasColumnName("is_p1_win");
             entity.Property(e => e.RoundNo).HasColumnName("round_no");
 
@@ -145,7 +146,7 @@ public partial class TictactoeContext : DbContext
                 .HasForeignKey(d => d.ClubId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Game_Club_Club");
-                
+
 
             entity.HasOne(d => d.Round).WithMany(p => p.RoundClubs)
                 .HasForeignKey(d => d.RoundId)
@@ -161,7 +162,10 @@ public partial class TictactoeContext : DbContext
             entity.ToTable("Round_Moves");
 
             entity.Property(e => e.MoveId).HasColumnName("move_id");
-            entity.Property(e => e.CellValue).HasColumnName("cellValue");
+            entity.Property(e => e.CellValue)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("cellValue");
             entity.Property(e => e.ColNo).HasColumnName("colNo");
             entity.Property(e => e.RoundId).HasColumnName("round_id");
             entity.Property(e => e.RowNo).HasColumnName("rowNo");

@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System.Security.Cryptography;
-using System.Text;
-using System.Xml.Linq;
 using TicTacToe.Data;
 using TicTacToe.Helpers;
 using TicTacToe.Models;
@@ -29,10 +26,6 @@ namespace TicTacToe.Controllers
         {
             return View();
         }
-        public IActionResult Game()
-        {
-            return PartialView();
-        }
         public IActionResult Privacy()
         {
             return View();
@@ -50,6 +43,7 @@ namespace TicTacToe.Controllers
             newUser.UserName = playerName;
             _context.Users.Add(newUser);
             _context.SaveChanges();
+            SetCookie(playerName);
             Game game = Models.Game.createGame();
             game.GameCode = FunctionHelper.GenerateCode(7, _context);
             game.P1UserId = _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p=>p.UserId).Last().UserId;
@@ -64,6 +58,7 @@ namespace TicTacToe.Controllers
             newUser.UserName = playerName;
             _context.Users.Add(newUser);
             _context.SaveChanges();
+            SetCookie(playerName);
             ViewData.Model= _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p => p.UserId).Last().UserId;
             return PartialView();
         }
@@ -76,9 +71,55 @@ namespace TicTacToe.Controllers
                                                                      .Include(g=>g.P1User)
                                                                      .Include(g=>g.P2User).First();
             game.OpponentUserId = (int)game.P2UserId;
+            game.CurrentRound.isPlayerTurn = true;
             game.MoveType = TicTacToeTypes.X;
             return PartialView("Game", game);
         }
+
+        public ActionResult Game(string gamecode)
+        {
+            Game game = _context.Games.Where(p => p.GameCode == gamecode).Include(g => g.Rounds)
+                                                         .ThenInclude(r => r.RoundClubs)
+                                                         .ThenInclude(rc => rc.Club)
+                                                         .Include(r=>r.Rounds)
+                                                         .ThenInclude(rm=>rm.RoundMoves)
+                                                         .Include(g => g.P1User)
+                                                         .Include(g => g.P2User).First();
+            string[] userInfo;
+            bool isP1player;
+            if (!string.IsNullOrWhiteSpace(Request.Cookies["UC"]))
+            {
+                userInfo = Request.Cookies["UC"].Split("_");
+
+                if (game.P1UserId == Convert.ToInt32(userInfo[1]))
+                {
+                    game.OpponentUserId = (int)game.P2UserId;
+                    game.MoveType = TicTacToeTypes.X;
+                    isP1player = true;
+                }
+                else if (game.P2UserId == Convert.ToInt32(userInfo[1]))
+                {
+                    game.OpponentUserId = game.P1UserId;
+                    game.MoveType = TicTacToeTypes.O;
+                    isP1player = false;
+                }
+                else
+                {
+                    return View("Game", null);
+                }
+
+                if ((isP1player && (bool)game.CurrentRound.IsP1Turn) || (!isP1player && (bool)!game.CurrentRound.IsP1Turn))
+                    game.CurrentRound.isPlayerTurn = true;
+                else if ((isP1player && (bool)!game.CurrentRound.IsP1Turn) || (!isP1player && (bool)game.CurrentRound.IsP1Turn))
+                    game.CurrentRound.isPlayerTurn = false;
+                return View("Game", game);
+            }
+            else
+            {
+                return View("Game", null);
+            }
+        }
+
         public ActionResult ConnectGame(int playerId, string gameCode)
         {
             if (_context.Games.Where(g => g.GameCode == gameCode).ToList().Count > 0)
@@ -95,6 +136,8 @@ namespace TicTacToe.Controllers
                         currentRound.RoundClubs.Add(selectedClub);
 
                     game.MoveType = TicTacToeTypes.O;
+                    game.CurrentRound.IsP1Turn = true;
+                    game.CurrentRound.isPlayerTurn = false;
                     _context.SaveChanges();
                     game = _context.Games.Where(g => g.GameCode == gameCode).Include(g => g.P1User)
                                                                             .Include(g => g.P2User)                                                                                     
@@ -180,6 +223,7 @@ namespace TicTacToe.Controllers
             }
             return choosenGameClubs;
         }
+
         public void SelectThreeTeams(List<RoundClub> gameC, List<Club> selectedClubs, List<Club> clubs)
         {
             int r;
@@ -195,6 +239,7 @@ namespace TicTacToe.Controllers
                 gameC.Add(gameClub);
             }
         }
+
         [HttpGet]
         public JsonResult MakeMove(int GameId, int CoordinateX, int CoordinateY,int PlayerId,TicTacToeTypes Movetype)
         {
@@ -214,13 +259,13 @@ namespace TicTacToe.Controllers
                     bool hasPlayerPlayedForFirstClub = _context.PlayerClubHistories.Where(p => p.PlayerId == PlayerId && p.ClubId == gameClubsForTheMove[0].ClubId).Count() > 0;
                     bool hasPlayerPlayedForSecondClub = _context.PlayerClubHistories.Where(p => p.PlayerId == PlayerId && p.ClubId == gameClubsForTheMove[1].ClubId).Count() > 0;
                     if (hasPlayerPlayedForFirstClub && hasPlayerPlayedForSecondClub)
-                        thisGame.CurrentRound.RoundMoves.Add(new RoundMove { ColNo = CoordinateY, RowNo = CoordinateX, CellValue = (int)Movetype });
+                        thisGame.CurrentRound.RoundMoves.Add(new RoundMove { ColNo = CoordinateY, RowNo = CoordinateX, CellValue = Movetype.ToString() });
                     else
                     {
                         signal.MakeMove(Movetype == TicTacToeTypes.X ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false);
                         return Json(new { correctMove = false, finishedRound = false });
                     }
-
+                    thisGame.CurrentRound.IsP1Turn = !thisGame.CurrentRound.IsP1Turn;
                     bool isFirstPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
                     bool isSecondPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
 
@@ -240,8 +285,9 @@ namespace TicTacToe.Controllers
                     else if((bool)actualRound.IsFinished)
                     {
                         int roundNo = actualRound.RoundNo+1;
-                        thisGame.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = roundNo });
+                        thisGame.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = roundNo, IsP1Turn = true });
                     }
+
                     _context.SaveChanges();
                     signal.MakeMove(Movetype == TicTacToeTypes.X ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, Movetype, false);
                     return Json(new { correctMove = true, finishedRound = actualRound.IsFinished });
@@ -269,6 +315,23 @@ namespace TicTacToe.Controllers
         public void SelectPlayer(int userId,string playerName)
         {
             signal.SelectedPlayer(userId, playerName);
+        }
+
+        private void SetCookie(string username)
+        {
+            int playerID = _context.Users.Where(u => u.UserName == username).First().UserId;
+            string cookieValue = username + "_" + playerID.ToString();
+            string cookie = Request.Cookies["UC"];
+            if (!string.IsNullOrWhiteSpace(cookie))
+            {
+                Response.Cookies.Delete("UC");
+            }
+            Response.Cookies.Append("UC", cookieValue, new CookieOptions
+            {
+                Expires = DateTimeOffset.Now.AddHours(2),
+                HttpOnly = true,
+                Path = "/"
+            });
         }
     }  
 }

@@ -74,6 +74,7 @@ function joinRoom(playerId) {
                 $(".tic").css("pointer-events", "none");
                 $("#playerName").prop("disabled", true);
                 $("#changeClubs").prop("disabled", true);
+                window.history.pushState(null, '', '/Home/Game?gamecode='+gameCode);
             },
             error: function (xhr, ajaxOptions, thrownError) {
             },

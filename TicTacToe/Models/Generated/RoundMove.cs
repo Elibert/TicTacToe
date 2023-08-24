@@ -13,7 +13,7 @@ public partial class RoundMove
 
     public int ColNo { get; set; }
 
-    public int CellValue { get; set; }
+    public string CellValue { get; set; } = null!;
 
     public virtual Round Round { get; set; } = null!;
 }

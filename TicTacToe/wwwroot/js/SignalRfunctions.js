@@ -14,6 +14,7 @@ connection.on("ChangeScreenEnterGame", (gameId) => {
         beforeSend: function () { $('#loading-container').show(); },
         success: function (data) {
             $("#content").html(data);
+            window.history.pushState(null, '', '/Home/Game?gamecode=' + $('#GameCode').val());
         },
         error: function (xhr, ajaxOptions, thrownError) {
         },

@@ -1,4 +1,24 @@
-﻿const searchInput = document.querySelector(".searchInput");
+﻿$(document).ready(function () {
+    if ($("#CurrentRound_isPlayerTurn").val().toLowerCase() == 'true') {
+        $(".tic").css("pointer-events", "auto");
+        $("#playerName").prop("disabled", false);
+        $("#changeClubs").prop("disabled", false);
+    }
+    else {
+        $(".tic").css("pointer-events", "none");
+        $("#playerName").prop("disabled", true);
+        $("#changeClubs").prop("disabled", true);
+    }
+
+    $(".gameMoveType").each(function () {
+        if ($(this).text().trim() == 'X')
+            $(this).css('color', 'red');
+        else if ($(this).text().trim() == 'O')
+            $(this).css('color', 'blue');
+    });
+});
+
+const searchInput = document.querySelector(".searchInput");
 const input = searchInput.querySelector("input");
 const resultBox = searchInput.querySelector(".resultBox");
 
@@ -85,7 +105,15 @@ $(".tic").click(function () {
             }, 
             success: function (data) {
                 if (data.finishedRound) {
-                    alert("Loja mbaroi");
+                    if ($("#MoveType").val() == 'X') {
+                        fontColor = 'red';
+                    }
+                    else {
+                        fontColor = 'blue';
+                    }
+                    $("#" + slot).text($("#MoveType").val());
+                    $("#" + slot).css('color', fontColor);
+                    alert("Loja mbaroi!");
                 }
                 else {
                     $(".tic").css("pointer-events", "none");
