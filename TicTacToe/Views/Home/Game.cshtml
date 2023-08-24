@@ -1,14 +1,17 @@
 ﻿@using TicTacToe.Models
-
+@using System.Linq
 @model Game
 
 <script src="@Url.Content("~/js/Views/Home/Game.js")" type="text/javascript" defer="defer"></script>
 
 <div hidden>
     @Html.HiddenFor(model=>model.GameId)
+    @Html.HiddenFor(model=>model.GameCode)
     @Html.HiddenFor(model=>model.Rounds)
     @Html.HiddenFor(model=>model.MoveType)
+    @Html.HiddenFor(model=>model.CurrentRound.isPlayerTurn)
     @Html.HiddenFor(model=>model.OpponentUserId)
+    @Html.HiddenFor(model=>model.CurrentRound.IsP1Turn)
     @Html.HiddenFor(model=>model.P1User.UserName, new{@id="P1UserName"})
     @Html.HiddenFor(model=>model.P2User.UserName, new{@id="P2UserName"})
 </div>
@@ -38,23 +41,70 @@
             <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[3].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[3].Club.ClubName" />
             <img class="small_loading" src="~/Content/GIF/small_loading.gif">
         </li>
-        <li class="tic" id="0_0"></li>
-        <li class="tic" id="0_1"></li>
-        <li class="tic" id="0_2"></li>
+        <li class="tic gameMoveType" id="0_0">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 0 && cr.ColNo == 0).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo==0 && cr.ColNo==0).First().CellValue
+            else
+                @string.Empty
+
+        </li>
+            <li class="tic gameMoveType" id="0_1">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 0 && cr.ColNo == 1).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo==0 && cr.ColNo==1).First().CellValue
+            else
+                @string.Empty
+        </li>
+        <li class="tic gameMoveType" id="0_2">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 0 && cr.ColNo == 2).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo==0 && cr.ColNo==2).First().CellValue
+            else
+                @string.Empty
+        </li>
         <li class="tic" id="5" style="background: none;">
             <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[4].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[4].Club.ClubName" />
             <img class="small_loading" src="~/Content/GIF/small_loading.gif">
         </li>
-        <li class="tic" id="1_0"></li>
-        <li class="tic" id="1_1"></li>
-        <li class="tic" id="1_2"></li>
+        <li class="tic gameMoveType" id="1_0">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 1 && cr.ColNo == 0).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo==1 && cr.ColNo==0).First().CellValue
+            else
+                @string.Empty
+        </li>
+        <li class="tic gameMoveType" id="1_1">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 1 && cr.ColNo == 1).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo==1 && cr.ColNo==1).First().CellValue
+            else
+                @string.Empty
+
+        </li>
+        <li class="tic gameMoveType" id="1_2">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 1 && cr.ColNo == 2).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo == 1 && cr.ColNo==2).First().CellValue
+            else
+                @string.Empty
+        </li>
         <li class="tic" id="6" style="background: none;">
             <img class="clubLogo" src="@Model.CurrentRoundClubs.ToList()[5].Club.ClubLogo" alt="@Model.CurrentRoundClubs.ToList()[5].Club.ClubName" />
             <img class="small_loading" src="~/Content/GIF/small_loading.gif">
         </li>
-        <li class="tic" id="2_0"></li>
-        <li class="tic" id="2_1"></li>
-        <li class="tic" id="2_2"></li>
+        <li class="tic gameMoveType" id="2_0">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 2 && cr.ColNo == 0).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo==2 && cr.ColNo==0).First().CellValue
+            else
+                @string.Empty
+        </li>
+        <li class="tic gameMoveType" id="2_1">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 2 && cr.ColNo == 1).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo==2 && cr.ColNo==1).First().CellValue
+            else
+                @string.Empty
+        </li>
+        <li class="tic gameMoveType" id="2_2">
+            @if (Model.CurrentRoundMoves.Where(cr => cr.RowNo == 2 && cr.ColNo == 2).Count() > 0)
+                @Model.CurrentRoundMoves.Where(cr=>cr.RowNo==2 && cr.ColNo==2).First().CellValue
+            else
+                @string.Empty
+        </li>
     </ul>
     <div class="clearfix"></div>
 </div>

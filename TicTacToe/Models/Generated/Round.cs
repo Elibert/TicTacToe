@@ -11,6 +11,8 @@ public partial class Round
 
     public int GameId { get; set; }
 
+    public bool? IsP1Turn { get; set; }
+
     public bool? IsP1Win { get; set; }
 
     public bool? IsFinished { get; set; }

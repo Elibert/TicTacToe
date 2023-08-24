@@ -27,14 +27,14 @@ namespace TicTacToe.Helpers
         }
         public static bool CheckIfThereIsAnyWinner(List<RoundMove> gameMoves, TicTacToeTypes player)
         {
-            int[] boardArray = new int[9];
+            string[] boardArray = new string[9];
             int counterIndex = 0;
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
                     List<RoundMove> moves = gameMoves.Where(gm => gm.RowNo == i && gm.ColNo == j).ToList();
-                    boardArray[counterIndex] = moves.Count() > 0 ? moves.First().CellValue : 2;
+                    boardArray[counterIndex] = moves.Count() > 0 ? moves.First().CellValue : "";
                     counterIndex++;
                 }
             }
@@ -45,7 +45,7 @@ namespace TicTacToe.Helpers
                 int counter = 0;
                 for (int j = 0; j < 3; j++)
                 {
-                    if (boardArray[winCombinations[i, j]] == (int)player)
+                    if (boardArray[winCombinations[i, j]] == player.ToString())
                     {
                         counter++;
                         if (counter == 3)
@@ -58,5 +58,20 @@ namespace TicTacToe.Helpers
             return false;
         }
 
+        public static void ChangeUserConnectionId(string user,string newConnId, TictactoeContext _context)
+        {
+            string[] userInfo = user.Split("_");
+            User userToChange = _context.Users.Where(u => u.UserName == userInfo[0] && u.UserId == Convert.ToInt32(userInfo[1])).First();
+
+            if(userToChange is object)
+            {
+                if(_context.UserConnections.Where(uc=>uc.UserId==userToChange.UserId).Count()>0)
+                {
+                    UserConnection userConnection = _context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).First();
+                    userConnection.ConnectionId = newConnId;
+                    _context.SaveChanges();
+                }
+            }
+        }
     }
 }
