@@ -1,4 +1,10 @@
-﻿$("#create").click(function () {
+﻿
+$(document).ready(function () {
+    window.sessionStorage.removeItem('minutes');
+    window.sessionStorage.removeItem('seconds');
+});
+
+$("#create").click(function () {
     var user = $("#player1Name").val();
     if (user != "" && user != null) {
         $.ajax({
@@ -74,6 +80,8 @@ function joinRoom(playerId) {
                 $(".tic").css("pointer-events", "none");
                 $("#playerName").prop("disabled", true);
                 $("#changeClubs").prop("disabled", true);
+                $('#p1timer').text("1:00");
+                countdown("p1timer","p2timer",false);
                 window.history.pushState(null, '', '/Home/Game?gamecode='+gameCode);
             },
             error: function (xhr, ajaxOptions, thrownError) {

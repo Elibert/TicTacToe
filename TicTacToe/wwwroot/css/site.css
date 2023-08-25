@@ -342,3 +342,11 @@ body {
     content: " ";
     background-color: #6cabdd;
 }
+
+.p1timer {
+    background-color: #da291c;
+}
+
+.p2timer {
+    background-color: #6cabdd;
+}

@@ -10,6 +10,23 @@
         $("#changeClubs").prop("disabled", true);
     }
 
+    if (window.sessionStorage.getItem('minutes') != null) {
+        if ($("#CurrentRound_IsP1Turn").val().toLowerCase() == 'true') {
+            $("#p2timer").css("display", "none");
+            $("#p1timer").css("display", "block");
+            var seconds = parseInt(window.sessionStorage.getItem('seconds')) - 1;
+            $("#p1timer").text(window.sessionStorage.getItem('minutes') + ":" + seconds);
+            countdown("p1timer", "p2timer", $("#CurrentRound_isPlayerTurn").val().toLowerCase() == 'true');
+        }
+        else {
+            $("#p1timer").css("display", "none");
+            $("#p2timer").css("display", "block");
+            var seconds = parseInt(window.sessionStorage.getItem('seconds')) - 1;
+            $("#p2timer").text(window.sessionStorage.getItem('minutes') + ":" + seconds);
+            countdown("p2timer", "p1timer", $("#CurrentRound_isPlayerTurn").val().toLowerCase() == 'true');
+        }
+    }
+
     $(".gameMoveType").each(function () {
         if ($(this).text().trim() == 'X')
             $(this).css('color', 'red');
@@ -122,6 +139,19 @@ $(".tic").click(function () {
                     $("#playerName").val("")
                     $("#playerId").val("");
                     $("#message").text("");
+                    var nonactivetimer, activetimer;
+                    if (!data.isP1turn) {
+                        activetimer = "p1timer"
+                        nonactivetimer = "p2timer";
+                    }
+                    else {
+                        activetimer = "p2timer"
+                        nonactivetimer = "p1timer";
+                    }
+                    $("#" + nonactivetimer).css("display", "none");
+                    $("#" + activetimer).css("display", "block");
+                    $("#" + activetimer).text("1:00");
+                    countdown(activetimer, nonactivetimer,false);
                     if (data.correctMove) {
                         var fontColor;
                         if ($("#MoveType").val() == 'X') {
@@ -178,3 +208,64 @@ $("#changeClubs").click(function () {
         }
     });
 });
+
+var interval;
+
+function countdown(activetimer,nonactivetimer,endturn) {
+    clearInterval(interval);
+    interval = setInterval(function () {
+        var timer = $('#' + activetimer).html();
+        timer = timer.split(':');
+        var minutes = timer[0];
+        var seconds = timer[1];
+        seconds -= 1;
+        if (minutes < 0) return;
+        else if (seconds < 0 && minutes != 0) {
+            minutes -= 1;
+            seconds = 59;
+        }
+        else if (seconds < 10 && length.seconds != 2) seconds = '0' + seconds;
+
+        $('#' + activetimer).html(minutes + ':' + seconds);
+          window.sessionStorage.setItem('minutes', minutes);
+          window.sessionStorage.setItem('seconds', seconds);
+
+        if (minutes == 0 && seconds == 0) {
+            window.sessionStorage.removeItem('minutes');
+            window.sessionStorage.removeItem('seconds');
+            if (endturn) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/MakeMove/",
+                    contentType: 'application/json; charset=utf-8',
+                    datatype: 'json',
+                    data: {
+                        GameId: $("#GameId").val(),
+                        Movetype: $("#MoveType").val()
+                    },
+                    success: function (data) {
+                        if (data.finishedRound) {
+                            alert("Loja mbaroi");
+                        }
+                        else {
+                            $(".tic").css("pointer-events", "none");
+                            $("#playerName").prop("disabled", true);
+                            $("#changeClubs").prop("disabled", true);
+                            $("#playerName").val("")
+                            $("#playerId").val("");
+                            $("#message").text("");
+                            $("#" + activetimer).css("display", "none");
+                            $("#" + nonactivetimer).css("display", "block");
+                            $("#" + nonactivetimer).text("1:00");
+                            countdown(nonactivetimer, activetimer, false);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                    }
+                });
+            }
+
+            clearInterval(interval);
+        } 
+    }, 1000);
+}
