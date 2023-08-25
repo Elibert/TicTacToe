@@ -136,7 +136,6 @@ namespace TicTacToe.Controllers
                         currentRound.RoundClubs.Add(selectedClub);
 
                     game.MoveType = TicTacToeTypes.O;
-                    game.CurrentRound.IsP1Turn = true;
                     game.CurrentRound.isPlayerTurn = false;
                     _context.SaveChanges();
                     game = _context.Games.Where(g => g.GameCode == gameCode).Include(g => g.P1User)
@@ -253,9 +252,9 @@ namespace TicTacToe.Controllers
 
                 bool currenTurnP1 = thisGame.CurrentRound.IsP1Turn.Value;
                 thisGame.CurrentRound.IsP1Turn = !thisGame.CurrentRound.IsP1Turn;
-                _context.SaveChanges();
                 if (CoordinateX==null && CoordinateY == null)
                 {
+                    _context.SaveChanges();
                     signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, null, null, null, false, currenTurnP1);
                     return Json(new { correctMove = false, finishedRound = false, isP1turn = currenTurnP1 });
                 }
@@ -271,6 +270,7 @@ namespace TicTacToe.Controllers
                         thisGame.CurrentRound.RoundMoves.Add(new RoundMove { ColNo = (int)CoordinateY, RowNo = (int)CoordinateX, CellValue = Movetype.ToString() });
                     else
                     {
+                        _context.SaveChanges();
                         signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false, currenTurnP1);
                         return Json(new { correctMove = false, finishedRound = false, isP1turn = currenTurnP1 });
                     }
@@ -302,6 +302,7 @@ namespace TicTacToe.Controllers
                 }
                 else
                 {
+                    _context.SaveChanges();
                     return Json(new { correctMove = false, finishedRound = true, isP1turn = currenTurnP1 });
                 }
             }

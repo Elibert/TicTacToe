@@ -15,7 +15,7 @@ connection.on("ChangeScreenEnterGame", (gameId) => {
         success: function (data) {
             $("#content").html(data);
             $('#p1timer').text("1:00");
-            countdown("p1timer", "p2timer");
+            countdown("p1timer", "p2timer",true);
             window.history.pushState(null, '', '/Home/Game?gamecode=' + $('#GameCode').val());
         },
         error: function (xhr, ajaxOptions, thrownError) {
@@ -70,7 +70,7 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
         $("#" + activetimer).css("display", "block");
         $('#' + activetimer).text("1:00");
         
-        countdown(activetimer, nonactivetimer);
+        countdown(activetimer, nonactivetimer,true);
     }
 });
 connection.on("selectedPlayer", (playerName) => {
@@ -95,5 +95,5 @@ connection.on("changeRoundClubs", (newRoundClubs, isP1turn) => {
     }
     $('#' + activetimer).text("1:00");
 
-    countdown(activetimer, nonactivetimer);
+    countdown(activetimer, nonactivetimer,false);
 });
