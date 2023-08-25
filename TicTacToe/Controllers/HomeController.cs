@@ -13,13 +13,13 @@ namespace TicTacToe.Controllers
         private readonly TictactoeContext _context;
         private static Random rnd= new Random();
         private SignalRSender signal;
-        private IConfiguration _config;
+        private readonly FunctionHelper functionHelper;
 
-        public HomeController(TictactoeContext context,IConfiguration config)
+        public HomeController(TictactoeContext context,FunctionHelper _functionHelper, SignalRSender signalRSender)
         {
             _context = context;
-            _config = config;
-            signal = new(_config);
+            signal = signalRSender;
+            functionHelper = _functionHelper;
         }
 
         public IActionResult Index()
@@ -45,7 +45,7 @@ namespace TicTacToe.Controllers
             _context.SaveChanges();
             SetCookie(playerName);
             Game game = Models.Game.createGame();
-            game.GameCode = FunctionHelper.GenerateCode(7, _context);
+            game.GameCode = functionHelper.GenerateCode(7);
             game.P1UserId = _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p=>p.UserId).Last().UserId;
             _context.Games.Add(game);
             _context.SaveChanges();
@@ -274,8 +274,8 @@ namespace TicTacToe.Controllers
                         signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false, currenTurnP1);
                         return Json(new { correctMove = false, finishedRound = false, isP1turn = currenTurnP1 });
                     }
-                    bool isFirstPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
-                    bool isSecondPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
+                    bool isFirstPlayerWinner = functionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
+                    bool isSecondPlayerWinner = functionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
 
                     if (isFirstPlayerWinner || isSecondPlayerWinner)
                         actualRound.IsFinished = true;  

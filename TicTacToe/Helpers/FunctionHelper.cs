@@ -7,7 +7,14 @@ namespace TicTacToe.Helpers
 {
     public class FunctionHelper
     {
-        public static string GenerateCode(int length, TictactoeContext _context)
+        private static TictactoeContext context;
+
+        public FunctionHelper(TictactoeContext tictactoeContext)
+        {
+            context = tictactoeContext;
+        }
+
+        public string GenerateCode(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             using (var rng = RandomNumberGenerator.Create())
@@ -21,11 +28,12 @@ namespace TicTacToe.Helpers
                     {
                         result.Append(chars[b % chars.Length]);
                     }
-                }while (_context.Games.Any(g=>g.GameCode==result.ToString()));
+                }while (context.Games.Any(g=>g.GameCode==result.ToString()));
                 return result.ToString();
             }
         }
-        public static bool CheckIfThereIsAnyWinner(List<RoundMove> gameMoves, TicTacToeTypes player)
+
+        public bool CheckIfThereIsAnyWinner(List<RoundMove> gameMoves, TicTacToeTypes player)
         {
             string[] boardArray = new string[9];
             int counterIndex = 0;
@@ -58,18 +66,18 @@ namespace TicTacToe.Helpers
             return false;
         }
 
-        public static void ChangeUserConnectionId(string user,string newConnId, TictactoeContext _context)
+        public static void ChangeUserConnectionId(string user,string newConnId)
         {
             string[] userInfo = user.Split("_");
-            User userToChange = _context.Users.Where(u => u.UserName == userInfo[0] && u.UserId == Convert.ToInt32(userInfo[1])).First();
+            User userToChange = context.Users.Where(u => u.UserName == userInfo[0] && u.UserId == Convert.ToInt32(userInfo[1])).First();
 
             if(userToChange is object)
             {
-                if(_context.UserConnections.Where(uc=>uc.UserId==userToChange.UserId).Count()>0)
+                if(context.UserConnections.Where(uc=>uc.UserId==userToChange.UserId).Count()>0)
                 {
-                    UserConnection userConnection = _context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).First();
+                    UserConnection userConnection = context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).First();
                     userConnection.ConnectionId = newConnId;
-                    _context.SaveChanges();
+                    context.SaveChanges();
                 }
             }
         }
