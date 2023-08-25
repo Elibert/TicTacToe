@@ -15,7 +15,7 @@ $("#create").click(function () {
             data: {
                 playerName: user,
             },
-            beforeSend: function () { $('#loading-container').show(); },
+            //beforeSend: function () { $('#loading-container').show(); },
             success: function (data) {
                 connection.invoke("Subscribe", user)
                     .catch(err => console.error(err));
@@ -23,9 +23,9 @@ $("#create").click(function () {
             },
             error: function (xhr, ajaxOptions, thrownError) {
             },
-            complete: function () {
-                $('#loading-container').hide();
-            }
+            //complete: function () {
+            //    $('#loading-container').hide();
+            //}
         });
     }
     else {
@@ -44,7 +44,7 @@ $("#join").click(function () {
             data: {
                 playerName: user,
             },
-            beforeSend: function () { $('#loading-container').show(); },
+            //beforeSend: function () { $('#loading-container').show(); },
             success: function (data) {
                 connection.invoke("Subscribe", user)
                     .catch(err => console.error(err));
@@ -52,9 +52,9 @@ $("#join").click(function () {
             },
             error: function (xhr, ajaxOptions, thrownError) {
             },
-            complete: function () {
-                $('#loading-container').hide();
-            }
+            //complete: function () {
+            //    $('#loading-container').hide();
+            //}
         });
     }
     else {
@@ -94,4 +94,12 @@ function joinRoom(playerId) {
     else {
         alert("Please fill name!");
     }
+}
+
+
+function copy() {
+    navigator.clipboard.writeText($("#gameCode").text());
+
+    $('#copied-success').css('opacity', '1');
+    setTimeout(function () { $('#copied-success').css('opacity', '0') }, 500);
 }

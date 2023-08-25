@@ -1,8 +1,17 @@
 ﻿@model string
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="@Url.Content("~/js/Views/Index/Index.js")" type="text/javascript" defer="defer"></script>
 
 <div class="form-container">
     <h2>Waiting for someone to join...</h2>
-    <h1>Game code: @Model</h1>
+    <div class="clipboard">
+        <h1>Game code: </h1><h1 id="gameCode">@Model</h1>
+        <button class="copy-btn" id="copyButton" onclick="copy()">
+            <img id="copy-img" src="~/Content/Images/copy.png" />
+        </button>
+    </div>
     <img id="waiting_bar" src="~/Content/GIF/loading-bar.gif" />
+    <div id="copied-success" class="copied">
+        <span>Copied!</span>
+    </div>
 </div>
