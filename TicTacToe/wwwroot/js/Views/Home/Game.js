@@ -1,13 +1,9 @@
 ﻿$(document).ready(function () {
     if ($("#CurrentRound_isPlayerTurn").val().toLowerCase() == 'true') {
-        $(".tic").css("pointer-events", "auto");
-        $("#playerName").prop("disabled", false);
-        $("#changeClubs").prop("disabled", false);
+        disableFunctions(false);
     }
     else {
-        $(".tic").css("pointer-events", "none");
-        $("#playerName").prop("disabled", true);
-        $("#changeClubs").prop("disabled", true);
+        disableFunctions(true);
     }
 
     if (window.sessionStorage.getItem('minutes') != null) {
@@ -55,8 +51,8 @@ input.onkeyup = (e) => {
                 if (data.length != 0) {
                     emptyArray = data;
                     emptyArray = emptyArray.map((data) => {
-                        // passing return data inside li tag
-                        return data = '<li value='+data.playerId+'>' + data.playerName + '</li>';
+                        var birthD = data.birthdate.split('T')[0];
+                        return data = '<li value=' + data.playerId + '>' + data.playerName + ' (' + birthD +')' + '</li>';
                     });
                     searchInput.classList.add("active"); //show autocomplete box
                     showSuggestions(emptyArray);
@@ -81,8 +77,9 @@ input.onkeyup = (e) => {
 }
 function select(param) {
     $("#playerId").val($(param).val());
-    $("#playerName").val("")
-    $("#message").text($(param).text() + " is selected.");
+    $("#playerName").val("");
+    var playerNm = $(param).text().split('(')[0];
+    $("#message").text(playerNm + " is selected.");
 
     searchInput.classList.remove("active");
 
@@ -93,7 +90,7 @@ function select(param) {
         datatype: 'json',
         data: {
             userId: $("#OpponentUserId").val(),
-            playerName: $(param).text(),
+            playerName: playerNm,
         },
         success: function (data) {
         },
@@ -133,9 +130,7 @@ $(".tic").click(function () {
                     alert("Loja mbaroi!");
                 }
                 else {
-                    $(".tic").css("pointer-events", "none");
-                    $("#playerName").prop("disabled", true);
-                    $("#changeClubs").prop("disabled", true);
+                    disableFunctions(true);
                     $("#playerName").val("")
                     $("#playerId").val("");
                     $("#message").text("");
@@ -248,9 +243,8 @@ function countdown(activetimer,nonactivetimer,endturn) {
                             alert("Loja mbaroi");
                         }
                         else {
-                            $(".tic").css("pointer-events", "none");
-                            $("#playerName").prop("disabled", true);
-                            $("#changeClubs").prop("disabled", true);
+                            disableFunctions(true);
+                            searchInput.classList.remove("active"); 
                             $("#playerName").val("")
                             $("#playerId").val("");
                             $("#message").text("");

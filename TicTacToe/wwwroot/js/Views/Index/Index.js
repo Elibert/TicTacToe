@@ -77,9 +77,7 @@ function joinRoom(playerId) {
             beforeSend: function () { $('#waiting_toJoin_bar').show(); },
             success: function (data) {
                 $("#content").html(data);
-                $(".tic").css("pointer-events", "none");
-                $("#playerName").prop("disabled", true);
-                $("#changeClubs").prop("disabled", true);
+                disableFunctions(true);
                 $('#p1timer').text("1:00");
                 countdown("p1timer","p2timer",false);
                 window.history.pushState(null, '', '/Home/Game?gamecode='+gameCode);
