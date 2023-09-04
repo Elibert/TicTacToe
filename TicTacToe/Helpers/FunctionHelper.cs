@@ -8,6 +8,9 @@ namespace TicTacToe.Helpers
     public class FunctionHelper
     {
         private static TictactoeContext context;
+        private static RSACryptoServiceProvider csp = new RSACryptoServiceProvider(2048);
+        private static RSAParameters privKey = csp.ExportParameters(true);
+        private static RSAParameters pubKey = csp.ExportParameters(false);
 
         public FunctionHelper(TictactoeContext tictactoeContext)
         {
@@ -66,19 +69,55 @@ namespace TicTacToe.Helpers
             return false;
         }
 
-        public static void ChangeUserConnectionId(string user,string newConnId)
+        public static void ChangeUserConnectionId(string cookieValue,string newConnId)
         {
+            string user = EncryptDecryptValue(false, cookieValue);
             string[] userInfo = user.Split("_");
-            User userToChange = context.Users.Where(u => u.UserName == userInfo[0] && u.UserId == Convert.ToInt32(userInfo[1])).First();
-
-            if(userToChange is object)
+            if (userInfo.Length == 2)
             {
-                if(context.UserConnections.Where(uc=>uc.UserId==userToChange.UserId).Count()>0)
+                User userToChange = context.Users.Where(u => u.UserName == userInfo[0] && u.UserId == Convert.ToInt32(userInfo[1])).First();
+
+                if(userToChange is object)
                 {
-                    UserConnection userConnection = context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).First();
-                    userConnection.ConnectionId = newConnId;
-                    context.SaveChanges();
+                    if (context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).Count() > 0)
+                    {
+                        UserConnection userConnection = context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).First();
+                        userConnection.ConnectionId = newConnId;
+                        context.SaveChanges();
+                    }
                 }
+            }
+        }
+
+        public static string EncryptDecryptValue(bool isEncrypt,string cookieValue)
+        {
+            if (isEncrypt)
+            {
+                string pubKeyString;
+                {
+                    var sw = new System.IO.StringWriter();
+                    var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                    xs.Serialize(sw, pubKey);
+                    pubKeyString = sw.ToString();
+                }
+                {
+                    var sr = new System.IO.StringReader(pubKeyString);
+                    var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                    pubKey = (RSAParameters)xs.Deserialize(sr);
+                }
+                RSACryptoServiceProvider csp = new RSACryptoServiceProvider();
+                csp.ImportParameters(pubKey);
+                byte[] bytesPlainTextData = Encoding.Unicode.GetBytes(cookieValue);
+                byte[] bytesCypherText = csp.Encrypt(bytesPlainTextData, false);
+                return Convert.ToBase64String(bytesCypherText);
+            }
+            else
+            {
+                byte[] bytesCypherText = Convert.FromBase64String(cookieValue);
+                RSACryptoServiceProvider csp = new RSACryptoServiceProvider();
+                csp.ImportParameters(privKey);
+                byte[] bytesPlainTextData = csp.Decrypt(bytesCypherText, false);
+                return Encoding.Unicode.GetString(bytesPlainTextData);
             }
         }
     }

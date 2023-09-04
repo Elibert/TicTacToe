@@ -89,19 +89,26 @@ namespace TicTacToe.Controllers
             bool isP1player;
             if (!string.IsNullOrWhiteSpace(Request.Cookies["UC"]))
             {
-                userInfo = Request.Cookies["UC"].Split("_");
-
-                if (game.P1UserId == Convert.ToInt32(userInfo[1]))
+                string decryptedCookieValue = FunctionHelper.EncryptDecryptValue(false, Request.Cookies["UC"]);
+                userInfo = decryptedCookieValue.Split("_");
+                if (userInfo.Length == 2)
                 {
-                    game.OpponentUserId = (int)game.P2UserId;
-                    game.MoveType = TicTacToeTypes.X;
-                    isP1player = true;
-                }
-                else if (game.P2UserId == Convert.ToInt32(userInfo[1]))
-                {
-                    game.OpponentUserId = game.P1UserId;
-                    game.MoveType = TicTacToeTypes.O;
-                    isP1player = false;
+                    if (game.P1UserId == Convert.ToInt32(userInfo[1]))
+                    {
+                        game.OpponentUserId = (int)game.P2UserId;
+                        game.MoveType = TicTacToeTypes.X;
+                        isP1player = true;
+                    }
+                    else if (game.P2UserId == Convert.ToInt32(userInfo[1]))
+                    {
+                        game.OpponentUserId = game.P1UserId;
+                        game.MoveType = TicTacToeTypes.O;
+                        isP1player = false;
+                    }
+                    else
+                    {
+                        return View("Game", null);
+                    }
                 }
                 else
                 {
@@ -330,14 +337,15 @@ namespace TicTacToe.Controllers
         {
             int playerID = _context.Users.Where(u => u.UserName == username).First().UserId;
             string cookieValue = username + "_" + playerID.ToString();
+            string encryptedCookieValue = FunctionHelper.EncryptDecryptValue(true, cookieValue);
             string cookie = Request.Cookies["UC"];
             if (!string.IsNullOrWhiteSpace(cookie))
             {
                 Response.Cookies.Delete("UC");
             }
-            Response.Cookies.Append("UC", cookieValue, new CookieOptions
+            Response.Cookies.Append("UC", encryptedCookieValue, new CookieOptions
             {
-                Expires = DateTimeOffset.Now.AddHours(2),
+                Expires = DateTimeOffset.Now.AddHours(1),
                 HttpOnly = true,
                 Path = "/"
             });
