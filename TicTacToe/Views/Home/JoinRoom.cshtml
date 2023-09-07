@@ -1,12 +1,18 @@
 ﻿@model int
-<script src="@Url.Content("~/js/Views/Index/Index.js")" type="text/javascript" defer="defer"></script>
-
+<script src="@Url.Content("~/js/Views/JoinRoom/JoinRoom.js")" type="text/javascript" defer="defer"></script>
+@{
+    var modelval = @Html.Raw(Json.Serialize(Model));
+}
 <div class="form-container">
+    @Html.Hidden("playerId", modelval);
     <h2>Enter game code you want to join</h2>
-    <input class="input-box" type="text" id="gameCode" placeholder="Game Code">
-    <div class="button-container">
-        <button class="button secondary joinRoom" onclick="joinRoom(@Model)">Join Room</button>
-    </div>
+    <input type="text" class="gameCodeInput" name="digit1" id="digit1"/>
+    <input type="text" class="gameCodeInput" name="digit2" />
+    <input type="text" class="gameCodeInput" name="digit3" />
+    <input type="text" class="gameCodeInput" name="digit4" />
+    <input type="text" class="gameCodeInput" name="digit5" />
+    <input type="text" class="gameCodeInput" name="digit6" />
+    <input type="text" class="gameCodeInput" name="digit7" />
     <div id="waiting_toJoin_bar">
     <img id="join_gif" src="~/Content/GIF/loading-bar.gif"/>
     </div>

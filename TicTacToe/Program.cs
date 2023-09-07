@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TicTacToe.Data;
 using TicTacToe.DataSet;
+using TicTacToe.Helpers;
 using TicTacToe.Signal;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<TictactoeContext>(options=>options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TICTACTOE;Integrated Security = true"));
 builder.Services.AddScoped<IGetData, GetDataController>();
+builder.Services.AddScoped<FunctionHelper>();
+builder.Services.AddScoped<SignalRSender>();
 builder.Services.AddSignalR();
 var app = builder.Build();
 

@@ -12,16 +12,19 @@ namespace TicTacToe.Signal
 
         private readonly TictactoeContext context;
 
-        public TicTacToeHub(TictactoeContext tictactoeContext)
+        private readonly FunctionHelper functionHelper;
+
+        public TicTacToeHub(TictactoeContext tictactoeContext, FunctionHelper functionHelper)
         {
             context = tictactoeContext;
+            this.functionHelper = functionHelper;
         }
         public override async Task OnConnectedAsync()
         {
             string user = Context.GetHttpContext().Request.Cookies["UC"];
 
             if (!string.IsNullOrWhiteSpace(user))
-                FunctionHelper.ChangeUserConnectionId(user,Context.ConnectionId,context);
+                FunctionHelper.ChangeUserConnectionId(user,Context.ConnectionId);
 
             await base.OnConnectedAsync();
         }

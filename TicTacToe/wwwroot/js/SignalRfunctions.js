@@ -69,9 +69,7 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
         }
         var slideout = document.getElementById('notif');
         slideout.classList.toggle('visible');
-        $(".tic").css("pointer-events", "auto");
-        $("#playerName").prop("disabled", false);
-        $("#changeClubs").prop("disabled", false);
+        disableFunctions(false);
         $("#playerName").val("")
         $("#message").text("");
 
@@ -109,3 +107,14 @@ connection.on("changeRoundClubs", (newRoundClubs, isP1turn, P1rounds, P2Rounds) 
 
     countdown(activetimer, nonactivetimer,false);
 });
+
+function disableFunctions(whatToDo) {
+    if (whatToDo) {
+        $(".tic").css("pointer-events", "none");
+    }
+    else {
+        $(".tic").css("pointer-events", "auto");
+    }
+    $("#playerName").prop("disabled", whatToDo);
+    $("#changeClubs").prop("disabled", whatToDo);
+}

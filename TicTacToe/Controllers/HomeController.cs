@@ -13,13 +13,13 @@ namespace TicTacToe.Controllers
         private readonly TictactoeContext _context;
         private static Random rnd= new Random();
         private SignalRSender signal;
-        private IConfiguration _config;
+        private readonly FunctionHelper functionHelper;
 
-        public HomeController(TictactoeContext context,IConfiguration config)
+        public HomeController(TictactoeContext context,FunctionHelper _functionHelper, SignalRSender signalRSender)
         {
             _context = context;
-            _config = config;
-            signal = new(_config);
+            signal = signalRSender;
+            functionHelper = _functionHelper;
         }
 
         public IActionResult Index()
@@ -45,7 +45,7 @@ namespace TicTacToe.Controllers
             _context.SaveChanges();
             SetCookie(playerName);
             Game game = Models.Game.createGame();
-            game.GameCode = FunctionHelper.GenerateCode(7, _context);
+            game.GameCode = functionHelper.GenerateCode(7);
             game.P1UserId = _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p=>p.UserId).Last().UserId;
             _context.Games.Add(game);
             _context.SaveChanges();
@@ -89,19 +89,26 @@ namespace TicTacToe.Controllers
             bool isP1player;
             if (!string.IsNullOrWhiteSpace(Request.Cookies["UC"]))
             {
-                userInfo = Request.Cookies["UC"].Split("_");
-
-                if (game.P1UserId == Convert.ToInt32(userInfo[1]))
+                string decryptedCookieValue = FunctionHelper.EncryptDecryptValue(false, Request.Cookies["UC"]);
+                userInfo = decryptedCookieValue.Split("_");
+                if (userInfo.Length == 2)
                 {
-                    game.OpponentUserId = (int)game.P2UserId;
-                    game.MoveType = TicTacToeTypes.X;
-                    isP1player = true;
-                }
-                else if (game.P2UserId == Convert.ToInt32(userInfo[1]))
-                {
-                    game.OpponentUserId = game.P1UserId;
-                    game.MoveType = TicTacToeTypes.O;
-                    isP1player = false;
+                    if (game.P1UserId == Convert.ToInt32(userInfo[1]))
+                    {
+                        game.OpponentUserId = (int)game.P2UserId;
+                        game.MoveType = TicTacToeTypes.X;
+                        isP1player = true;
+                    }
+                    else if (game.P2UserId == Convert.ToInt32(userInfo[1]))
+                    {
+                        game.OpponentUserId = game.P1UserId;
+                        game.MoveType = TicTacToeTypes.O;
+                        isP1player = false;
+                    }
+                    else
+                    {
+                        return View("Game", null);
+                    }
                 }
                 else
                 {
@@ -274,8 +281,8 @@ namespace TicTacToe.Controllers
                         signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false, currenTurnP1, new List<int>());
                         return Json(new { correctMove = false, finishedRound = false, isP1turn = currenTurnP1 });
                     }
-                    List<int> isFirstPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
-                    List<int> isSecondPlayerWinner = FunctionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
+                    List<int> isFirstPlayerWinner = functionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
+                    List<int> isSecondPlayerWinner = functionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
 
                     if (isFirstPlayerWinner.Count == 3 || isSecondPlayerWinner.Count == 3)
                         actualRound.IsFinished = true;  
@@ -330,14 +337,15 @@ namespace TicTacToe.Controllers
         {
             int playerID = _context.Users.Where(u => u.UserName == username).First().UserId;
             string cookieValue = username + "_" + playerID.ToString();
+            string encryptedCookieValue = FunctionHelper.EncryptDecryptValue(true, cookieValue);
             string cookie = Request.Cookies["UC"];
             if (!string.IsNullOrWhiteSpace(cookie))
             {
                 Response.Cookies.Delete("UC");
             }
-            Response.Cookies.Append("UC", cookieValue, new CookieOptions
+            Response.Cookies.Append("UC", encryptedCookieValue, new CookieOptions
             {
-                Expires = DateTimeOffset.Now.AddHours(2),
+                Expires = DateTimeOffset.Now.AddHours(1),
                 HttpOnly = true,
                 Path = "/"
             });

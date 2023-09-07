@@ -7,7 +7,17 @@ namespace TicTacToe.Helpers
 {
     public class FunctionHelper
     {
-        public static string GenerateCode(int length, TictactoeContext _context)
+        private static TictactoeContext context;
+        private static RSACryptoServiceProvider csp = new RSACryptoServiceProvider(2048);
+        private static RSAParameters privKey = csp.ExportParameters(true);
+        private static RSAParameters pubKey = csp.ExportParameters(false);
+
+        public FunctionHelper(TictactoeContext tictactoeContext)
+        {
+            context = tictactoeContext;
+        }
+
+        public string GenerateCode(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             using (var rng = RandomNumberGenerator.Create())
@@ -21,7 +31,7 @@ namespace TicTacToe.Helpers
                     {
                         result.Append(chars[b % chars.Length]);
                     }
-                }while (_context.Games.Any(g=>g.GameCode==result.ToString()));
+                }while (context.Games.Any(g=>g.GameCode==result.ToString()));
                 return result.ToString();
             }
         }
@@ -61,19 +71,55 @@ namespace TicTacToe.Helpers
             return possibleWinnigCombination;
         }
 
-        public static void ChangeUserConnectionId(string user,string newConnId, TictactoeContext _context)
+        public static void ChangeUserConnectionId(string cookieValue,string newConnId)
         {
+            string user = EncryptDecryptValue(false, cookieValue);
             string[] userInfo = user.Split("_");
-            User userToChange = _context.Users.Where(u => u.UserName == userInfo[0] && u.UserId == Convert.ToInt32(userInfo[1])).First();
-
-            if(userToChange is object)
+            if (userInfo.Length == 2)
             {
-                if(_context.UserConnections.Where(uc=>uc.UserId==userToChange.UserId).Count()>0)
+                User userToChange = context.Users.Where(u => u.UserName == userInfo[0] && u.UserId == Convert.ToInt32(userInfo[1])).First();
+
+                if(userToChange is object)
                 {
-                    UserConnection userConnection = _context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).First();
-                    userConnection.ConnectionId = newConnId;
-                    _context.SaveChanges();
+                    if (context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).Count() > 0)
+                    {
+                        UserConnection userConnection = context.UserConnections.Where(uc => uc.UserId == userToChange.UserId).First();
+                        userConnection.ConnectionId = newConnId;
+                        context.SaveChanges();
+                    }
                 }
+            }
+        }
+
+        public static string EncryptDecryptValue(bool isEncrypt,string cookieValue)
+        {
+            if (isEncrypt)
+            {
+                string pubKeyString;
+                {
+                    var sw = new System.IO.StringWriter();
+                    var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                    xs.Serialize(sw, pubKey);
+                    pubKeyString = sw.ToString();
+                }
+                {
+                    var sr = new System.IO.StringReader(pubKeyString);
+                    var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                    pubKey = (RSAParameters)xs.Deserialize(sr);
+                }
+                RSACryptoServiceProvider csp = new RSACryptoServiceProvider();
+                csp.ImportParameters(pubKey);
+                byte[] bytesPlainTextData = Encoding.Unicode.GetBytes(cookieValue);
+                byte[] bytesCypherText = csp.Encrypt(bytesPlainTextData, false);
+                return Convert.ToBase64String(bytesCypherText);
+            }
+            else
+            {
+                byte[] bytesCypherText = Convert.FromBase64String(cookieValue);
+                RSACryptoServiceProvider csp = new RSACryptoServiceProvider();
+                csp.ImportParameters(privKey);
+                byte[] bytesPlainTextData = csp.Decrypt(bytesCypherText, false);
+                return Encoding.Unicode.GetString(bytesPlainTextData);
             }
         }
     }
