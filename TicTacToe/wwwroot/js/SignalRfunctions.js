@@ -32,7 +32,7 @@ connection.start()
     })
     .catch(err => console.error(err));
 
-connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinished, isP1turn) => {
+connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinished, isP1turn, combination) => {
     if (moveType != null) {
         var fontColor;
         if (moveType == 0) {
@@ -47,8 +47,17 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
         $("#" + coordinateX + '_' + coordinateY).css('color', fontColor);
     }
     if (isRoundFinished) {
+        $("#strikethrough div").css("background-color", fontColor);
+        $("#strikethrough").css(setupStrikethrough(combination)).show()
+            .children("div")
+            .animate({ width: "100%" }, endGame());
+
+        setTimeout(() => {        
+                $("#strikethrough").css("display", "none")
+                    .children("div").css("width", 0);
+        }, 3000);
     }
-    else {
+  //  else {
         var nonactivetimer, activetimer;
         if (!isP1turn) {
             activetimer = "p1timer";
@@ -71,12 +80,12 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
         $('#' + activetimer).text("1:00");
         
         countdown(activetimer, nonactivetimer,true);
-    }
+   // }
 });
 connection.on("selectedPlayer", (playerName) => {
     $("#message").text("Opponent selected " + playerName);
 });
-connection.on("changeRoundClubs", (newRoundClubs, isP1turn) => {
+connection.on("changeRoundClubs", (newRoundClubs, isP1turn, P1rounds, P2Rounds) => {
     for (var i = 0; i < Object.keys(newRoundClubs).length; i++) {
         $("#" + parseInt(i + 1) + " .clubLogo").attr("alt", Object.keys(newRoundClubs)[i])
         $("#" + parseInt(i + 1) + " .clubLogo").attr("src", Object.values(newRoundClubs)[i])
@@ -86,6 +95,9 @@ connection.on("changeRoundClubs", (newRoundClubs, isP1turn) => {
             $("#"+i+"_"+j).text('');
         }
     }
+    $(".team1").text(P1rounds);
+    $(".team2").text(P2Rounds);
+
     var activetimer;
     if (isP1turn) {
         activetimer = "p1timer";

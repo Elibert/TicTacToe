@@ -34,7 +34,7 @@ namespace TicTacToe.Signal
             }).Wait();
         }
 
-        public void MakeMove(int userId, int? coordinateX, int? coordinateY, TicTacToeTypes? moveType, bool isRoundFinished, bool isP1turn)
+        public void MakeMove(int userId, int? coordinateX, int? coordinateY, TicTacToeTypes? moveType, bool isRoundFinished, bool isP1turn, List<int> combination)
         {
             connection.StartAsync().ContinueWith(task =>
             {
@@ -45,7 +45,7 @@ namespace TicTacToe.Signal
                 else
                 {
                     //if connection is successfull, do something
-                    connection.InvokeAsync("MakeMove",userId, coordinateX, coordinateY, moveType, isRoundFinished, isP1turn);
+                    connection.InvokeAsync("MakeMove",userId, coordinateX, coordinateY, moveType, isRoundFinished, isP1turn, combination);
 
                 }
             }).Wait();
@@ -68,7 +68,7 @@ namespace TicTacToe.Signal
             }).Wait();
         }
 
-        public void ChangeRoundClubs(int P1UserId, int P2UserId, Dictionary<string, string> newRoundClubs,bool isP1turn)
+        public void ChangeRoundClubs(int P1UserId, int P2UserId, Dictionary<string, string> newRoundClubs,bool isP1turn, int P1rounds, int P2rounds)
         {
             connection.StartAsync().ContinueWith(task =>
             {
@@ -79,7 +79,7 @@ namespace TicTacToe.Signal
                 else
                 {
                     //if connection is successfull, do something
-                    connection.InvokeAsync("ChangeClubs", P1UserId, P2UserId, newRoundClubs, isP1turn);
+                    connection.InvokeAsync("ChangeClubs", P1UserId, P2UserId, newRoundClubs, isP1turn, P1rounds, P2rounds);
                 }
             }).Wait();
         }
