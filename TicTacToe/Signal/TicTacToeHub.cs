@@ -46,7 +46,7 @@ namespace TicTacToe.Signal
             {
                 if (context.Users.Where(u=>u.UserName==user).Count()>0)
                 {
-                    int userId = context.Users.Where(u => u.UserName == user).OrderByDescending(p => p.UserId).Last().UserId;
+                    int userId = context.Users.Where(u => u.UserName == user).OrderByDescending(p => p.UserId).First().UserId;
                     context.UserConnections.Add(new Models.UserConnection { UserId = userId, ConnectionId = Context.ConnectionId });
                     context.SaveChanges();
                 }
