@@ -191,7 +191,7 @@ namespace TicTacToe.Controllers
             foreach (var item in game.CurrentRoundClubs)
                 newRoundClubs.Add(item.Club.ClubName,item.Club.ClubLogo);
 
-            signal.ChangeRoundClubs(game.P1UserId,(int)game.P2UserId, newRoundClubs, game.CurrentRound.IsP1Turn.Value);
+            signal.ChangeRoundClubs(game.P1UserId,(int)game.P2UserId, newRoundClubs, game.CurrentRound.IsP1Turn.Value, game.RoundsWonByFirstPlayer,game.RoundsWonBySecondPlayer);
         }
 
         public List<RoundClub> SelectClubsForRound()
@@ -262,7 +262,7 @@ namespace TicTacToe.Controllers
                 if (CoordinateX==null && CoordinateY == null)
                 {
                     _context.SaveChanges();
-                    signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, null, null, null, false, currenTurnP1);
+                    signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, null, null, null, false, currenTurnP1, new List<int>());
                     return Json(new { correctMove = false, finishedRound = false, isP1turn = currenTurnP1 });
                 }
                 if (!thisGame.IsFinished)
@@ -278,17 +278,17 @@ namespace TicTacToe.Controllers
                     else
                     {
                         _context.SaveChanges();
-                        signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false, currenTurnP1);
+                        signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, null,false, currenTurnP1, new List<int>());
                         return Json(new { correctMove = false, finishedRound = false, isP1turn = currenTurnP1 });
                     }
-                    bool isFirstPlayerWinner = functionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
-                    bool isSecondPlayerWinner = functionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
+                    List<int> isFirstPlayerWinner = functionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.X);
+                    List<int> isSecondPlayerWinner = functionHelper.CheckIfThereIsAnyWinner(thisGame.CurrentRoundMoves ,TicTacToeTypes.O);
 
-                    if (isFirstPlayerWinner || isSecondPlayerWinner)
+                    if (isFirstPlayerWinner.Count == 3 || isSecondPlayerWinner.Count == 3)
                         actualRound.IsFinished = true;  
-                    if (isFirstPlayerWinner)
+                    if (isFirstPlayerWinner.Count == 3)
                         actualRound.IsP1Win = true;
-                    if (isSecondPlayerWinner)
+                    if (isSecondPlayerWinner.Count == 3)
                         actualRound.IsP1Win = false;
 
                     if(thisGame.Rounds.Where(r=>(bool)r.IsP1Win).Count()==3 || thisGame.Rounds.Where(r => (bool)!r.IsP1Win).Count() == 3)
@@ -300,12 +300,12 @@ namespace TicTacToe.Controllers
                     else if((bool)actualRound.IsFinished)
                     {
                         int roundNo = actualRound.RoundNo+1;
-                        thisGame.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = roundNo, IsP1Turn = true });
+                        thisGame.Rounds.Add(new Round { IsFinished = false, IsP1Win = false, RoundNo = roundNo, IsP1Turn = !currenTurnP1 });
                     }
 
                     _context.SaveChanges();
-                    signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, Movetype, false, currenTurnP1);
-                    return Json(new { correctMove = true, finishedRound = actualRound.IsFinished, isP1turn = currenTurnP1 });
+                    signal.MakeMove(currenTurnP1 ? (int)thisGame.P2UserId : thisGame.P1UserId, CoordinateX, CoordinateY, Movetype, actualRound.IsFinished.Value, currenTurnP1, actualRound.IsP1Win.Value ? isFirstPlayerWinner : isSecondPlayerWinner);
+                    return Json(new { correctMove = true, finishedRound = actualRound.IsFinished, isP1turn = currenTurnP1, combination = actualRound.IsP1Win.Value ? isFirstPlayerWinner : isSecondPlayerWinner });
                 }
                 else
                 {

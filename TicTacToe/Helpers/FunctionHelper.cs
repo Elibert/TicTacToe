@@ -35,8 +35,7 @@ namespace TicTacToe.Helpers
                 return result.ToString();
             }
         }
-
-        public bool CheckIfThereIsAnyWinner(List<RoundMove> gameMoves, TicTacToeTypes player)
+        public List<int> CheckIfThereIsAnyWinner(List<RoundMove> gameMoves, TicTacToeTypes player)
         {
             string[] boardArray = new string[9];
             int counterIndex = 0;
@@ -51,22 +50,25 @@ namespace TicTacToe.Helpers
             }
 
             int[,] winCombinations = new int[8, 3] { { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 }, { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 }, { 0, 4, 8 }, { 2, 4, 6 } };
+            List<int> possibleWinnigCombination = new List<int>();
             for (int i = 0; i < 8; i++)
             {
+                possibleWinnigCombination.Clear();
                 int counter = 0;
                 for (int j = 0; j < 3; j++)
                 {
                     if (boardArray[winCombinations[i, j]] == player.ToString())
                     {
+                        possibleWinnigCombination.Add(winCombinations[i, j]);
                         counter++;
                         if (counter == 3)
                         {
-                            return true;
+                            return possibleWinnigCombination;
                         }
                     }
                 }
             }
-            return false;
+            return possibleWinnigCombination;
         }
 
         public static void ChangeUserConnectionId(string cookieValue,string newConnId)

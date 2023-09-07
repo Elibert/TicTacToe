@@ -43,14 +43,14 @@ body {
 }
 .autocomplete_container{
     width:100%;
-    margin:40px auto;
+    margin:auto;
 }
 
 .autocomplete_container .searchInput {
     background: #fff;
-    width: 106%;
+    width: 450px;
     border-radius: 5px;
-    position: relative;
+    position: absolute;
     box-shadow: 0px 1px 5px 3px rgba(0,0,0,0.12);
 }
 
@@ -117,12 +117,12 @@ body {
   clear: both;
 }
 #box{
-  width: 450px;
-  overflow: auto;
-  margin: 40px auto;
-  background: #666;
-  padding-bottom: 40px;
-  border-radius: 10px;
+    width: 450px;
+    overflow: auto;
+    margin: 40px auto;
+    background: #666;
+    padding-bottom: 40px;
+    border-radius: 10px;
 }
 #message{
   background: #333;
@@ -340,17 +340,17 @@ body {
 
 .wrapper {
     position: relative;
-    height: 28vh;
+    height: 70px;
     top: 0px;
 }
 
 .scoreboard-outer {
-    position: relative;
+    position: absolute;
     display: flex;
-    width: 300px;
+    width: 429px;
     height: 40px;
     top: 50px;
-    left: 15%;
+    left: 3%;
     background-color: #53e2d4;
 }
 
@@ -415,4 +415,16 @@ body {
 .gameCodeInput:focus {
     border: 2px solid yellowgreen;
     outline: none;
+}
+
+#strikethrough {
+    display: none;
+    position: absolute;
+    height: 5px;
+}
+
+#strikethrough div {
+    position: absolute;
+    height: 5px;
+    width: 0px;
 }

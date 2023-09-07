@@ -74,16 +74,16 @@ namespace TicTacToe.Signal
            await Clients.Client(GetConnectionId(userId)).SendAsync("ChangeScreenEnterGame", gameId);
         }
 
-        public async Task MakeMove(int userId, int? coordinateX, int? coordinateY, TicTacToeTypes? moveType, bool isRoundfinished, bool isP1turn)
+        public async Task MakeMove(int userId, int? coordinateX, int? coordinateY, TicTacToeTypes? moveType, bool isRoundfinished, bool isP1turn, List<int> combination)
         {
-            await Clients.Client(GetConnectionId(userId)).SendAsync("changeTurns", coordinateX, coordinateY, moveType, isRoundfinished, isP1turn);
+            await Clients.Client(GetConnectionId(userId)).SendAsync("changeTurns", coordinateX, coordinateY, moveType, isRoundfinished, isP1turn, combination);
         }
         public async Task SelectedPlayer(int userId, string playerName)
         {
             await Clients.Client(GetConnectionId(userId)).SendAsync("selectedPlayer", playerName);
         }
 
-        public async Task ChangeClubs(int P1UserId, int P2UserId, Dictionary<string, string> newRoundClubs,bool isP1turn)
+        public async Task ChangeClubs(int P1UserId, int P2UserId, Dictionary<string, string> newRoundClubs,bool isP1turn, int P1rounds, int P2rounds)
         {
             List<int> usersToChangeClubs = new();
             List<string> connIds = new();
@@ -93,7 +93,7 @@ namespace TicTacToe.Signal
             foreach(int userId in usersToChangeClubs)
                 connIds.Add(GetConnectionId(userId));
 
-            await Clients.Clients(connIds).SendAsync("changeRoundClubs", newRoundClubs, isP1turn);
+            await Clients.Clients(connIds).SendAsync("changeRoundClubs", newRoundClubs, isP1turn, P1rounds,P2rounds);
         }
 
         public string GetConnectionId(int userId)
