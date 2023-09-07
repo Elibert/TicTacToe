@@ -59,7 +59,7 @@ namespace TicTacToe.Controllers
             _context.Users.Add(newUser);
             _context.SaveChanges();
             SetCookie(playerName);
-            ViewData.Model= _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p => p.UserId).Last().UserId;
+            ViewData.Model= _context.Users.Where(p => p.UserName == playerName).OrderByDescending(p => p.UserId).First().UserId;
             return PartialView();
         }
 
@@ -335,7 +335,7 @@ namespace TicTacToe.Controllers
 
         private void SetCookie(string username)
         {
-            int playerID = _context.Users.Where(u => u.UserName == username).First().UserId;
+            int playerID = _context.Users.Where(u => u.UserName == username).OrderByDescending(u=>u.UserId).First().UserId;
             string cookieValue = username + "_" + playerID.ToString();
             string encryptedCookieValue = FunctionHelper.EncryptDecryptValue(true, cookieValue);
             string cookie = Request.Cookies["UC"];
