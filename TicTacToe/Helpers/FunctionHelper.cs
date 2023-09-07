@@ -35,7 +35,7 @@ namespace TicTacToe.Helpers
                 return result.ToString();
             }
         }
-        public static List<int> CheckIfThereIsAnyWinner(List<RoundMove> gameMoves, TicTacToeTypes player)
+        public List<int> CheckIfThereIsAnyWinner(List<RoundMove> gameMoves, TicTacToeTypes player)
         {
             string[] boardArray = new string[9];
             int counterIndex = 0;

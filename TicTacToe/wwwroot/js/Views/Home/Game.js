@@ -118,8 +118,12 @@ $(".tic").click(function () {
                 Movetype: $("#MoveType").val()
             }, 
             success: function (data) {
-                var timeout_time = 0;
-                if (data.finishedRound) {
+                disableFunctions(true);
+                $("#playerName").val("")
+                $("#playerId").val("");
+                $("#message").text("");
+                if (data.correctMove) {
+                    var fontColor;
                     if ($("#MoveType").val() == 'X') {
                         fontColor = 'red';
                     }
@@ -128,12 +132,16 @@ $(".tic").click(function () {
                     }
                     $("#" + slot).text($("#MoveType").val());
                     $("#" + slot).css('color', fontColor);
+                }
+                else {
+                    alert("wrong move");
+                }
+
+                if (data.finishedRound) {    
                     $("#strikethrough div").css("background-color", fontColor);
                     $("#strikethrough").css(setupStrikethrough(data.combination)).show()
                         .children("div")
                         .animate({ width: "100%" });
-
-                    timeout_time = 3000;
 
                     setTimeout(() => {
                         $.ajax({
@@ -159,13 +167,10 @@ $(".tic").click(function () {
                             error: function (xhr, ajaxOptions, thrownError) {
                             }
                         });
-                    }, timeout_time);
+                    }, 3000);
                 }
               //  else {
-                disableFunctions(true);
-                $("#playerName").val("")
-                $("#playerId").val("");
-                $("#message").text("");
+
                 var nonactivetimer, activetimer;
                 if (!data.isP1turn) {
                     activetimer = "p1timer"
@@ -176,23 +181,12 @@ $(".tic").click(function () {
                     nonactivetimer = "p1timer";
                 }
                 $("#" + nonactivetimer).css("display", "none");
-                $("#" + activetimer).css("display", "block");
-                $("#" + activetimer).text("1:00");
-                countdown(activetimer, nonactivetimer,false);
-                if (data.correctMove) {
-                    var fontColor;
-                    if ($("#MoveType").val() == 'X') {
-                        fontColor = 'red';
-                    }
-                    else {
-                        fontColor = 'blue';
-                    }
-                    $("#" + slot).text($("#MoveType").val());
-                    $("#" + slot).css('color', fontColor);
+                if (!data.finishedRound) {
+                    $("#" + activetimer).css("display", "block");
+                    $("#" + activetimer).text("1:00");
+                    countdown(activetimer, nonactivetimer, false);
                 }
-                else {
-                    alert("wrong move");
-                }
+
                // }
             },
             error: function (xhr, ajaxOptions, thrownError) {
@@ -211,7 +205,8 @@ function setupStrikethrough(array) {
             return {
                 transform: "none",
                 top: 330,
-                "padding-left":113,
+                "padding-left": 113,
+                "padding-bottom": 0,
                 width: defaultWidth
             };
             break;
@@ -220,6 +215,7 @@ function setupStrikethrough(array) {
                 transform: "none",
                 top: 419,
                 "padding-left": 113,
+                "padding-bottom": 0,
                 width: defaultWidth
             };
             break;
@@ -228,6 +224,7 @@ function setupStrikethrough(array) {
                 transform: "none",
                 top: 507,
                 "padding-left": 113,
+                "padding-bottom": 0,
                 width: defaultWidth
             };
             break;
@@ -235,7 +232,8 @@ function setupStrikethrough(array) {
             return {
                 transform: "rotate(90deg)",
                 top: 398,
-                "padding-bottom": 55,
+                "padding-bottom": 46,
+                "padding-left": 0,
                 width: defaultWidth
             };
             break;
@@ -244,6 +242,7 @@ function setupStrikethrough(array) {
                 transform: "rotate(90deg)",
                 top: 310,
                 "padding-bottom": 235,
+                "padding-left": 0,
                 width: defaultWidth
             };
             break;
@@ -252,6 +251,7 @@ function setupStrikethrough(array) {
                 transform: "rotate(90deg)",
                 top: 220,
                 "padding-bottom": 415,
+                "padding-left": 0,
                 width: defaultWidth
             };
             break;
@@ -260,6 +260,7 @@ function setupStrikethrough(array) {
                 transform: "rotate(45deg)",
                 top: 353,
                 "padding-left": 89,
+                "padding-bottom": 0,
                 "transform-origin": "center",
                 width: diagonalWidth
             };
@@ -269,6 +270,7 @@ function setupStrikethrough(array) {
                 transform: "rotate(-45deg)",
                 top: 484,
                 "padding-left": 94,
+                "padding-bottom": 0,
                 width: diagonalWidth,
                 "transform-origin":"center"
             };
@@ -313,7 +315,7 @@ $("#changeClubs").click(function () {
 
 var interval;
 
-function countdown(activetimer,nonactivetimer,endturn) {
+function countdown(activetimer, nonactivetimer, endturn) {
     clearInterval(interval);
     interval = setInterval(function () {
         var timer = $('#' + activetimer).html();

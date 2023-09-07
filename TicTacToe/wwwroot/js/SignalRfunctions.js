@@ -50,7 +50,7 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
         $("#strikethrough div").css("background-color", fontColor);
         $("#strikethrough").css(setupStrikethrough(combination)).show()
             .children("div")
-            .animate({ width: "100%" }, endGame());
+            .animate({ width: "100%" });
 
         setTimeout(() => {        
                 $("#strikethrough").css("display", "none")
@@ -67,17 +67,21 @@ connection.on("changeTurns", (coordinateX, coordinateY, moveType, isRoundFinishe
             activetimer = "p2timer"
             nonactivetimer = "p1timer";
         }
-        var slideout = document.getElementById('notif');
-        slideout.classList.toggle('visible');
+        if (!isRoundFinished) {
+            var slideout = document.getElementById('notif');
+            slideout.classList.toggle('visible');
+        }
         disableFunctions(false);
         $("#playerName").val("")
         $("#message").text("");
 
         $("#" + nonactivetimer).css("display", "none");
-        $("#" + activetimer).css("display", "block");
-        $('#' + activetimer).text("1:00");
-        
-        countdown(activetimer, nonactivetimer,true);
+        if (!isRoundFinished) {
+            $("#" + activetimer).css("display", "block");
+            $('#' + activetimer).text("1:00");
+
+            countdown(activetimer, nonactivetimer, true);
+        }
    // }
 });
 connection.on("selectedPlayer", (playerName) => {
@@ -96,15 +100,17 @@ connection.on("changeRoundClubs", (newRoundClubs, isP1turn, P1rounds, P2Rounds) 
     $(".team1").text(P1rounds);
     $(".team2").text(P2Rounds);
 
-    var activetimer;
+    var activetimer, nonactivetimer;
     if (isP1turn) {
         activetimer = "p1timer";
+        nonactivetimer = "p2timer";
     }
     else {
-        activetimer = "p2timer"
+        activetimer = "p2timer";
+        nonactivetimer = "p1timer";
     }
     $('#' + activetimer).text("1:00");
-
+    $("#" + activetimer).css("display", "block");
     countdown(activetimer, nonactivetimer,false);
 });
 
