@@ -205,7 +205,7 @@ function setupStrikethrough(array) {
         case JSON.stringify(SEV_WINS[0]):
             return {
                 transform: "none",
-                top: 330,
+                top: 284,
                 "padding-left": 113,
                 "padding-bottom": 0,
                 width: defaultWidth
@@ -214,7 +214,7 @@ function setupStrikethrough(array) {
         case JSON.stringify(SEV_WINS[1]):
             return {
                 transform: "none",
-                top: 419,
+                top: 375,
                 "padding-left": 113,
                 "padding-bottom": 0,
                 width: defaultWidth
@@ -223,7 +223,7 @@ function setupStrikethrough(array) {
         case JSON.stringify(SEV_WINS[2]):
             return {
                 transform: "none",
-                top: 507,
+                top: 464,
                 "padding-left": 113,
                 "padding-bottom": 0,
                 width: defaultWidth
@@ -232,8 +232,8 @@ function setupStrikethrough(array) {
         case JSON.stringify(SEV_WINS[3]):
             return {
                 transform: "rotate(90deg)",
-                top: 398,
-                "padding-bottom": 46,
+                top: 358,
+                "padding-bottom": 52,
                 "padding-left": 0,
                 width: defaultWidth
             };
@@ -241,8 +241,8 @@ function setupStrikethrough(array) {
         case JSON.stringify(SEV_WINS[4]):
             return {
                 transform: "rotate(90deg)",
-                top: 310,
-                "padding-bottom": 235,
+                top: 266,
+                "padding-bottom": 233,
                 "padding-left": 0,
                 width: defaultWidth
             };
@@ -250,8 +250,8 @@ function setupStrikethrough(array) {
         case JSON.stringify(SEV_WINS[5]):
             return {
                 transform: "rotate(90deg)",
-                top: 220,
-                "padding-bottom": 415,
+                top: 177,
+                "padding-bottom": 411,
                 "padding-left": 0,
                 width: defaultWidth
             };
@@ -259,8 +259,8 @@ function setupStrikethrough(array) {
         case JSON.stringify(SEV_WINS[6]):
             return {
                 transform: "rotate(45deg)",
-                top: 353,
-                "padding-left": 89,
+                top: 310,
+                "padding-left": 86,
                 "padding-bottom": 0,
                 "transform-origin": "center",
                 width: diagonalWidth
@@ -269,8 +269,8 @@ function setupStrikethrough(array) {
         case JSON.stringify(SEV_WINS[7]):
             return {
                 transform: "rotate(-45deg)",
-                top: 484,
-                "padding-left": 94,
+                top: 431,
+                "padding-left": 86,
                 "padding-bottom": 0,
                 width: diagonalWidth,
                 "transform-origin":"center"
