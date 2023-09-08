@@ -4,8 +4,8 @@
     var modelval = @Html.Raw(Json.Serialize(Model));
 }
 <div class="form-container">
-    @Html.Hidden("playerId", modelval);
-    <h2>Enter game code you want to join</h2>
+    @Html.Hidden("playerId", modelval)
+    <h2>Enter game code to join</h2>
     <input type="text" class="gameCodeInput" name="digit1" id="digit1"/>
     <input type="text" class="gameCodeInput" name="digit2" />
     <input type="text" class="gameCodeInput" name="digit3" />

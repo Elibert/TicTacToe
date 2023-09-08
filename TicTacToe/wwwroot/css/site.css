@@ -1,5 +1,7 @@
+@import url(https://fonts.googleapis.com/css?family=Francois+One|Raleway|Cairo);
+
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
@@ -26,7 +28,7 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Times New Roman', sans-serif;
+    font-family: 'Francois One';
 }
 
 body {
@@ -64,6 +66,7 @@ body {
     padding: 0 60px 0 20px;
     font-size: 18px;
     box-shadow: 0px 1px 5px rgba(0,0,0,0.1);
+    font-family: Cairo;
 }
 
 .searchInput.active input {
@@ -91,6 +94,7 @@ body {
     width: 100%;
     cursor: default;
     border-radius: 3px;
+    font-family:Cairo;
 }
 
 .searchInput.active .resultBox li {
@@ -130,16 +134,17 @@ body {
   color: #fff;
 }
 #gameBoard li{
-  float: left;
-  margin: 10px;
-  height: 70px;
-  width: 70px;
-  font-size: 50px;
-  background: rgb(0 0 0 / 60%);
-  color: #ccc;
-  list-style: none;
-  text-align: center;
-  border-radius: 5px;
+    float: left;
+    margin: 10px;
+    height: 70px;
+    width: 70px;
+    font-size: 50px;
+    background: rgb(0 0 0 / 60%);
+    color: #ccc;
+    list-style: none;
+    text-align: center;
+    border-radius: 5px;
+    font-family: Raleway;
 }
 #gameBoard li:hover, #reset:hover {
     cursor: pointer;
@@ -231,7 +236,7 @@ footer{
     align-items: center;
     position: fixed;
     top: 100px;
-    left: -200px;
+    right: -300px;
 }
 
 #alert {
