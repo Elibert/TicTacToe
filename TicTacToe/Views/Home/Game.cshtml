@@ -15,8 +15,16 @@
     @Html.HiddenFor(model=>model.P1User.UserName, new{@id="P1UserName"})
     @Html.HiddenFor(model=>model.P2User.UserName, new{@id="P2UserName"})
 </div>
-<div class="button-container">
-    <button class="button secondary" id="changeClubs">Change Clubs</button>
+<div class="container-forButton">
+    <div class="center">
+        <button class="btn" id="changeClubs">
+            <svg width="180px" height="60px" viewBox="0 0 180 60" class="border">
+                <polyline points="179,1 179,59 1,59 1,1 179,1" class="bg-line" />
+                <polyline points="179,1 179,59 1,59 1,1 179,1" class="hl-line" />
+            </svg>
+            <span>Change Clubs</span>
+        </button>
+    </div>
 </div>
 
 @Html.Partial("~/Views/Home/GameScore.cshtml")
