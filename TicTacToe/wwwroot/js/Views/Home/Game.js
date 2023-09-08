@@ -101,7 +101,7 @@ function select(param) {
 
 $(".tic").click(function () {
     if ($("#playerId").val() == "" || $("#playerId").val() == null) {
-        alert("Select a player!");
+        showMessage("Select a player!");
     }
     else {
         var slot = $(this).attr('id');
@@ -134,7 +134,7 @@ $(".tic").click(function () {
                     $("#" + slot).css('color', fontColor);
                 }
                 else {
-                    alert("wrong move");
+                    showMessage("Wrong player!");
                 }
 
                 if (data.finishedRound) {    
@@ -349,7 +349,7 @@ function countdown(activetimer, nonactivetimer, endturn) {
                     },
                     success: function (data) {
                         if (data.finishedRound) {
-                            alert("Loja mbaroi");
+                            showMessage("Round is finished");
                         }
                         else {
                             disableFunctions(true);
