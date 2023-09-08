@@ -5,5 +5,6 @@ In a normal Tic Tac Toe game you can put a X or O on any empty square, but in th
 
 Video of the gameplay: 
 
-https://github.com/Elibert/TicTacToe/assets/75449094/2e19ad31-1086-4a54-b788-fd32049d7bcc
+https://github.com/Elibert/TicTacToe/assets/75449094/30e205fc-b9cd-4de3-b9ec-e5e8068280aa
+
 
