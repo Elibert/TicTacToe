@@ -155,12 +155,12 @@ namespace TicTacToe.Controllers
                 }
                 else
                 {
-                    return View();
+                    return Json(new { correctCode= false });
                 }
             }
             else
             {
-                return View();
+                return Json(new { correctCode = false });
             }
         }
 

@@ -31,6 +31,10 @@ inputElements.forEach((ele, index) => {
                     },
                     beforeSend: function () { $('#waiting_toJoin_bar').show(); },
                     success: function (data) {
+                        if (!data.correctCode && data.correctCode != undefined) {
+                            showMessage("Game Code is invalid");
+                            return false;
+                        }
                         $("#content").html(data);
                         disableFunctions(true);
                         $('#p1timer').text("1:00");

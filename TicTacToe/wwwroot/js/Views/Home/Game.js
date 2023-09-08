@@ -57,6 +57,7 @@ input.onkeyup = (e) => {
                     searchInput.classList.add("active"); //show autocomplete box
                     showSuggestions(emptyArray);
                     let allList = resultBox.querySelectorAll("li");
+                    window.scrollTo(0, document.body.scrollHeight);
                     for (let i = 0; i < allList.length; i++) {
                         //adding onclick attribute in all li tag
                         allList[i].setAttribute("onclick", "select(this)");
