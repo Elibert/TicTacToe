@@ -120,7 +120,7 @@ body {
     width: 450px;
     overflow: auto;
     margin: 40px auto;
-    background: #666;
+    background: #200a32a1;
     padding-bottom: 40px;
     border-radius: 10px;
 }
@@ -134,7 +134,7 @@ body {
   height: 70px;
   width: 70px;
   font-size: 50px;
-  background: #333;
+  background: rgb(0 0 0 / 60%);
   color: #ccc;
   list-style: none;
   text-align: center;
@@ -233,23 +233,38 @@ footer{
     left: -200px;
 }
 
+#alert {
+    width: 300px;
+    height: 50px;
+    background: #a82c2c;
+    color: white;
+    border-radius: 3px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 100px;
+    right: -300px;
+}
+
 @keyframes movein {
     from {
-        left: -200px;
+        right: -300px;
     }
 
     to {
-        left: 10px;
+        right: 10px;
     }
 }
 
 @keyframes moveout {
     from {
-        left: 10px;
+        right: 10px;
     }
 
     to {
-        left: -200px;
+        right: -300px;
     }
 }
 

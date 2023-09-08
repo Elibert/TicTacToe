@@ -7,30 +7,35 @@ $(document).ready(function () {
 $("#create").click(function () {
     var user = $("#player1Name").val();
     if (user != "" && user != null) {
-        $.ajax({
-            type: "GET",
-            url: "/Home/CreateGame/",
-            contentType: 'application/json; charset=utf-8',
-            datatype: 'json',
-            data: {
-                playerName: user,
-            },
-            //beforeSend: function () { $('#loading-container').show(); },
-            success: function (data) {              
-                connection.invoke("Subscribe", user)
-                    .catch(function (e) {
-                    });
-                $("#content").html(data);
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-            },
-            //complete: function () {
-            //    $('#loading-container').hide();
-            //}
-        });
+        if (user.length > 8) {
+            showMessage('Username is longer than 8 characters!');
+        }
+        else {
+            $.ajax({
+                type: "GET",
+                url: "/Home/CreateGame/",
+                contentType: 'application/json; charset=utf-8',
+                datatype: 'json',
+                data: {
+                    playerName: user,
+                },
+                //beforeSend: function () { $('#loading-container').show(); },
+                success: function (data) {              
+                    connection.invoke("Subscribe", user)
+                        .catch(function (e) {
+                        });
+                    $("#content").html(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                },
+                //complete: function () {
+                //    $('#loading-container').hide();
+                //}
+            });
+        }
     }
     else {
-        alert("Please fill name!");
+        showMessage('Please fill name!');
     }
 })
 
@@ -59,7 +64,7 @@ $("#join").click(function () {
         });
     }
     else {
-        alert("Please fill name!");
+        showMessage('Please fill game code!');
     }
 })
 function copy() {
