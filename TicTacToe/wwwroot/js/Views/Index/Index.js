@@ -42,29 +42,34 @@ $("#create").click(function () {
 $("#join").click(function () {
     var user = $("#player1Name").val();
     if (user != "" && user != null) {
-        $.ajax({
-            type: "GET",
-            url: "/Home/JoinRoom/",
-            contentType: 'application/json; charset=utf-8',
-            datatype: 'json',
-            data: {
-                playerName: user,
-            },
-            //beforeSend: function () { $('#loading-container').show(); },
-            success: function (data) {
-                connection.invoke("Subscribe", user)
-                    .catch(err => console.error(err));
-                $("#content").html(data);
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-            },
-            //complete: function () {
-            //    $('#loading-container').hide();
-            //}
-        });
+        if (user.length > 8) {
+            showMessage('Username is longer than 8 characters!');
+        }
+        else {
+            $.ajax({
+                type: "GET",
+                url: "/Home/JoinRoom/",
+                contentType: 'application/json; charset=utf-8',
+                datatype: 'json',
+                data: {
+                    playerName: user,
+                },
+                //beforeSend: function () { $('#loading-container').show(); },
+                success: function (data) {
+                    connection.invoke("Subscribe", user)
+                        .catch(err => console.error(err));
+                    $("#content").html(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                },
+                //complete: function () {
+                //    $('#loading-container').hide();
+                //}
+            });
+        }
     }
     else {
-        showMessage('Please fill game code!');
+        showMessage('Please fill name!');
     }
 })
 function copy() {
